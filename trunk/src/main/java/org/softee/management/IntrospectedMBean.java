@@ -9,11 +9,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
@@ -28,7 +25,9 @@ import javax.management.MBeanNotificationInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.ReflectionException;
 
-import org.softee.management.annotation.Description;
+import org.softee.management.annotation.MBean;
+import org.softee.management.annotation.Operation;
+import org.softee.management.annotation.Property;
 
 public class IntrospectedMBean implements DynamicMBean {
     private final Object mbean;
@@ -46,9 +45,9 @@ public class IntrospectedMBean implements DynamicMBean {
     public IntrospectedMBean(Object mbean) throws javax.management.IntrospectionException, IntrospectionException {
         this.mbean = mbean;
         this.mbeanType = mbean.getClass();
-        if (!mbeanType.isAnnotationPresent(Description.class)) {
+        if (!mbeanType.isAnnotationPresent(MBean.class)) {
             throw new IllegalArgumentException(
-                    String.format("mbean type %s is not annotated with %s", mbean.getClass(), Description.class));
+                    String.format("mbean type %s is not annotated with %s", mbean.getClass(), MBean.class));
         }
         this.beanInfo = Introspector.getBeanInfo(mbeanType);
         this.propertyDescriptors = propertyDescriptors();
@@ -156,7 +155,8 @@ public class IntrospectedMBean implements DynamicMBean {
      * @throws javax.management.IntrospectionException
      */
     private MBeanInfo mbeanInfo() throws javax.management.IntrospectionException, IntrospectionException {
-        final String description = description();
+        MBean annotation = mbean.getClass().getAnnotation(MBean.class);
+        final String description = annotation.value();
         final MBeanAttributeInfo[] attributeInfo = attributeInfo();
         final MBeanConstructorInfo[] constructorInfo = constructorInfo();
         final MBeanOperationInfo[] operationInfo = operationInfo();
@@ -182,13 +182,12 @@ public class IntrospectedMBean implements DynamicMBean {
      * @return
      */
     private Map<String, Method> operationMethods() {
-        Set<Method> propertyMethods = propertyMethods();
         Map<String, Method> operationMethods = new HashMap<String, Method>();
         for (MethodDescriptor descriptor : beanInfo.getMethodDescriptors()) {
             Method method = descriptor.getMethod();
-            Description description = getAnnotation(Description.class, method);
-            if (description != null && !propertyMethods.contains(method)) {
-                // This method is Description annotated and not a property/attribute method
+            Operation operation = getAnnotation(Operation.class, method);
+            if (operation != null) {
+                // This method is an operation
                 operationMethods.put(method.getName(), method);
             }
         }
@@ -199,25 +198,10 @@ public class IntrospectedMBean implements DynamicMBean {
         MBeanOperationInfo[] operationInfos = new MBeanOperationInfo[operationMethods.size()];
         int i = 0;
         for (Method method : operationMethods.values()) {
-            Description description = getAnnotation(Description.class, method);
+            Operation description = getAnnotation(Operation.class, method);
             operationInfos[i++] = new MBeanOperationInfo(description.value(), method);
         }
         return operationInfos;
-    }
-
-    private Set<Method> propertyMethods() {
-        Set<Method> methods = new HashSet<Method>();
-        for (PropertyDescriptor property : propertyDescriptors.values()) {
-            addNotNull(methods, property.getReadMethod());
-            addNotNull(methods, property.getWriteMethod());
-        }
-        return methods;
-    }
-
-    private <E> void addNotNull(Collection<E> elements, E element) {
-        if (element != null) {
-            elements.add(element);
-        }
     }
 
     private MBeanConstructorInfo[] constructorInfo() {
@@ -226,13 +210,14 @@ public class IntrospectedMBean implements DynamicMBean {
     }
 
     /**
-     * @return all properties where getter or setter is annotated with {@link Description}
+     * @return all properties where getter or setter is annotated with {@link org.softee.management.annotation.Property}
      */
     private Map<String, PropertyDescriptor> propertyDescriptors() {
         Map<String, PropertyDescriptor> properties = new HashMap<String, PropertyDescriptor>();
         for (PropertyDescriptor property: beanInfo.getPropertyDescriptors()) {
-            Description description = getAnnotation(Description.class, property.getReadMethod(), property.getWriteMethod());
-            if (description != null) {
+            Property attribute = getAnnotation(Property.class, 
+                        property.getReadMethod(), property.getWriteMethod());
+            if (attribute != null) {
                 properties.put(property.getName(), property);
             }
         }
@@ -255,10 +240,10 @@ public class IntrospectedMBean implements DynamicMBean {
                         String.format("Setter method %s of class %s has != 1 parameters (does not follow beanspec)",
                                 writeMethod.getName(), writeMethod.getDeclaringClass()));
             }
-            Description description = getAnnotation(Description.class, readMethod, writeMethod);
+            Property attribute = getAnnotation(Property.class, readMethod, writeMethod);
             MBeanAttributeInfo info = new MBeanAttributeInfo(
                     property.getName(),
-                    description.value(),
+                    attribute.value(),
                     readMethod,
                     writeMethod);
             infos[i++] = info;
@@ -287,8 +272,4 @@ public class IntrospectedMBean implements DynamicMBean {
     }
 
 
-    private String description() {
-        Description description = mbean.getClass().getAnnotation(Description.class);
-        return (description != null) ? description.value() : null;
-    }
 }

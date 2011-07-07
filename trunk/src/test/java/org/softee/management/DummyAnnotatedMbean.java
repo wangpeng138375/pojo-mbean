@@ -1,28 +1,27 @@
 package org.softee.management;
 
-import javax.management.MXBean;
-
-import org.softee.management.annotation.Description;
+import org.softee.management.annotation.MBean;
+import org.softee.management.annotation.Operation;
 import org.softee.management.annotation.Parameter;
+import org.softee.management.annotation.Property;
 
-@MXBean
-@Description("DummyAnnotatedMbean")
+@MBean("DummyAnnotatedMbean")
 public class DummyAnnotatedMbean {
     int integer;
     final String string = "A string";
     String operationArgument;
 
-    @Description("string")
+    @Property("string")
     public String getString() {
         return string;
     }
 
-    @Description("voidOneArgOperation")
-    public void voidOneArgOperation(@Parameter(name = "argument", value = "An argument") String argument) {
+    @Operation("voidOneArgOperation")
+    public void voidOneArgOperation(@Parameter(name = "argument", description = "An argument") String argument) {
         operationArgument = argument;
     }
 
-    @Description("integer")
+    @Property("integer")
     public void setInteger(int integer) {
         this.integer = integer;
     }
