@@ -1,6 +1,5 @@
 package org.softee.management;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.BufferedReader;
@@ -8,23 +7,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.InstanceNotFoundException;
-import javax.management.IntrospectionException;
-import javax.management.MBeanRegistrationException;
-import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
-import javax.management.NotCompliantMBeanException;
-import javax.management.ObjectName;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.softee.management.annotation.MBean;
 import org.softee.management.annotation.Operation;
@@ -57,9 +43,6 @@ import org.softee.management.annotation.Property;
  */
 @MBean("Generic MBean for monitoring input/output processing")
 public class ProcessingPojoMBean extends AbstractPojoMBean {
-    private static final long NONE = Long.MIN_VALUE;
-    private final DatatypeFactory dtf;
-    private final String instanceName;
     
     private AtomicLong inputCount;
     private AtomicLong inputLatest;
@@ -76,12 +59,6 @@ public class ProcessingPojoMBean extends AbstractPojoMBean {
     private AtomicLong failedLatest;
     private Throwable failedLatestCause;
 
-    private AtomicLong started;
-
-    private final MBeanServer mBeanServer;
-    private ObjectName mBeanObjectName;
-
-
     /**
      * Create a monitor
      * @param monitored the class that is monitored, used for identifying the MBean in the JConsole or JMX Console
@@ -90,39 +67,7 @@ public class ProcessingPojoMBean extends AbstractPojoMBean {
      * @throws RuntimeException if the monitor could not be created
      */
     public ProcessingPojoMBean(Object monitored, String instanceName) throws MalformedObjectNameException {
-        if (instanceName == null) {
-            throw new NullPointerException("instanceName");
-        }
-        this.instanceName = instanceName;
-        mBeanServer = ManagementFactory.getPlatformMBeanServer();
-        mBeanObjectName = createObjectName(monitored, instanceName);
-        try {
-            dtf = DatatypeFactory.newInstance();
-        } catch (DatatypeConfigurationException e) {
-            throw new RuntimeException(e);
-        }
-        reset();
-    }
-
-    private ObjectName createObjectName(Object instance, String instanceName) throws MalformedObjectNameException {
-        return new ObjectName(getClass().getPackage().getName() + ":name=" + instanceName + ",type=" + instance.getClass().getName());
-    }
-
-    /**
-     * Start monitoring and register the MBean with the MBean server
-     * @throws ManagementException 
-     */
-    public void start() throws ManagementException {
-        register();
-        started.set(now());
-    }
-
-    /**
-     * Stop monitoring and unregister the MBean with the MBean server
-     * @throws ManagementException 
-     */
-    public void stop() throws ManagementException {
-        unregister();
+        super(monitored, instanceName);
     }
 
     /**
@@ -202,8 +147,10 @@ public class ProcessingPojoMBean extends AbstractPojoMBean {
         register();
     }
 
-    @Operation("Reset the monitor statistics")
+    @Override
+    @Operation("Reset the statistics")
     public synchronized void reset() {
+        super.reset();
         started = none();
         inputLatest = none();
         outputLatest = none();
@@ -217,10 +164,6 @@ public class ProcessingPojoMBean extends AbstractPojoMBean {
         durationMaxMillis = none();
     }
 
-    @Property("Name of this instance")
-    public String getName() {
-        return instanceName;
-    }
     
     @Property("Number of messages received")
     public long getInputCount() {
@@ -328,87 +271,5 @@ public class ProcessingPojoMBean extends AbstractPojoMBean {
             // Impossible
         }
         return lines.toArray(new String[lines.size()]);
-    }
-    
-    /**
-     * Register the MXBean.
-     * If the registration fails, a WARN message is logged
-     * @throws java.beans.IntrospectionException 
-     * @throws IntrospectionException 
-     * @throws NotCompliantMBeanException 
-     * @throws MBeanRegistrationException 
-     * @throws InstanceAlreadyExistsException 
-     */
-    protected void register() throws ManagementException {
-        try {
-            mBeanServer.registerMBean(new IntrospectedDynamicMBean(this), mBeanObjectName);
-        } catch (Exception e) {
-            throw new ManagementException(e);
-        }
-    }
-
-    /**
-     * Unregister the MXBean.
-     * If the unregistration fails, a WARN message is logged
-     * @throws InstanceNotFoundException 
-     * @throws MBeanRegistrationException 
-     */
-    protected void unregister() throws ManagementException {
-        try {
-            mBeanServer.unregisterMBean(mBeanObjectName);
-        } catch (Exception e) {
-           throw new ManagementException(e);
-        }
-    }
-
-    protected Long noneAsNull(AtomicLong a) {
-        long n = a.get();
-        return n == NONE ? null : n;
-    }
-
-    protected Long age(Long millis, TimeUnit unit) {
-        return millis == null ? null : unit.convert(now() - millis, MILLISECONDS);
-    }
-
-    /**
-     * 
-     * @param millis
-     * @return millis formatted as an ISO 8601 (XML datetime) string
-     */
-    protected String dateString(Long millis) {
-        if (millis == null) {
-            return null;
-        }
-        return date(millis).toXMLFormat();
-    }
-    /**
-     * XMLGregorianCalendar used because it provides a standard formatting (ISO 8601) and timezone handling
-     * @param millis
-     * @return an XMLGregorianCalendar in the current timezone.<p>
-     * TODO consider forcing TimeZone to UTC
-     */
-    protected XMLGregorianCalendar date(Long millis) {
-        if (millis == null) {
-            return null;
-        }
-        GregorianCalendar gCal = new GregorianCalendar();
-        gCal.setTimeInMillis(millis);
-        return dtf.newXMLGregorianCalendar(gCal);
-    }
-
-    protected long now() {
-        return System.currentTimeMillis();
-    }
-
-    protected AtomicLong zero() {
-        return new AtomicLong();
-    }
-
-    protected boolean isNone(AtomicLong x) {
-        return x.get() == NONE;
-    }
-    
-    protected AtomicLong none() {
-        return new AtomicLong(NONE);
     }
 }
