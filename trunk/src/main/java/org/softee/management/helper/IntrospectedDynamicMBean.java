@@ -28,6 +28,7 @@ import javax.management.ReflectionException;
 
 import org.softee.management.annotation.MBean;
 import org.softee.management.annotation.Operation;
+import org.softee.management.annotation.Operation.Impact;
 import org.softee.management.annotation.Parameter;
 import org.softee.management.annotation.Property;
 /**
@@ -213,12 +214,14 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
             // add description and names to parameters
             MBeanParameterInfo[] signature = parameterInfo(method);
             // add description and parameter info to operation method
+            Impact impact = (annotation.impact() != null) ? annotation.impact() : Impact.UNKNOWN;
+            int impactValue = impact.impactValue;
             MBeanOperationInfo opInfo = new MBeanOperationInfo(
                     method.getName(), 
                     annotation.value(), 
                     signature, 
                     method.getReturnType().getName(),
-                    MBeanOperationInfo.UNKNOWN,
+                    impactValue,
                     null);
             operationInfos[operationIndex++] = opInfo;
         }
