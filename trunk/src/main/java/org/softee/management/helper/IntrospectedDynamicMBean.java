@@ -1,4 +1,4 @@
-package org.softee.management;
+package org.softee.management.helper;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;

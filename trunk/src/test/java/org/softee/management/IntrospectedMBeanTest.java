@@ -13,6 +13,7 @@ import javax.management.MBeanOperationInfo;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.softee.management.helper.IntrospectedDynamicMBean;
 
 public class IntrospectedMBeanTest {
     private DummyAnnotatedMbean annotatedMBean;

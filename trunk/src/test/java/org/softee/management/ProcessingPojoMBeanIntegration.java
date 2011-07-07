@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.softee.time.StopWatch;
 
 
-public class MonitorMBeanIntegration {
+public class ProcessingPojoMBeanIntegration {
     private static final int AVERAGE_PROCESSING_TIME_MILLIS = 10000;
     private int count = 0;
     private ProcessingPojoMBean monitor;
