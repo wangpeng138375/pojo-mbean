@@ -6,22 +6,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Adds description to a parameter of an MBean operation
+ * Annotation for MBean operation methods.
+ * 
  * @author morten.hattesen@gmail.com
- *
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.PARAMETER})
-public @interface Parameter {
+@Target({ElementType.TYPE, ElementType.METHOD})
+public @interface Operation {
     /**
-     *
-     * @return name of the parameter
+     * @return the textual description of the attribute to be displayed by the management agent
      */
-    String name();
-
-    /**
-     *
-     * @return description of the parameter
-     */
-    String description();
+    String value();
 }

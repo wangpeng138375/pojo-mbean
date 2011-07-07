@@ -4,12 +4,11 @@ import java.util.Date;
 
 import javax.management.DynamicMBean;
 import javax.management.IntrospectionException;
-import javax.management.MXBean;
 
-import org.softee.management.annotation.Description;
+import org.softee.management.annotation.Property;
+import org.softee.management.annotation.MBean;
 
-@MXBean
-@Description("A Basic Annotated MBean implementation")
+@MBean("A Basic Annotated MBean implementation")
 public class AnnotatedMBean {
     private final Object monitored;
     private final String instanceName;
@@ -21,7 +20,7 @@ public class AnnotatedMBean {
         created = new Date();
     }
 
-    @Description("The time at which the MBean was created")
+    @Property("The time at which the MBean was created")
     public Date getCreated() {
         return created;
     }
