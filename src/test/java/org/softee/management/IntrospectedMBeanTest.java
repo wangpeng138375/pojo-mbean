@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import javax.management.Attribute;
+import javax.management.AttributeList;
 import javax.management.DynamicMBean;
 import javax.management.InvalidAttributeValueException;
 import javax.management.MBeanAttributeInfo;
@@ -24,11 +25,6 @@ public class IntrospectedMBeanTest {
     }
 
     @Test
-    public void testAnnotatedMBean() {
-        fail("Not yet implemented");
-    }
-
-    @Test
     public void testGetAttribute() throws Exception {
         Object attribute = introspectedMBean.getAttribute("string");
         assertEquals(annotatedMBean.string, attribute);
@@ -36,7 +32,9 @@ public class IntrospectedMBeanTest {
 
     @Test
     public void testGetAttributes() throws Exception {
-        fail("Not yet implemented");
+        AttributeList attributes = introspectedMBean.getAttributes(new String[] {"string"});
+        Attribute attribute = (Attribute) attributes.get(0);
+        assertEquals(annotatedMBean.string, attribute.getValue());
     }
 
     @Test(expected=InvalidAttributeValueException.class)
@@ -47,15 +45,19 @@ public class IntrospectedMBeanTest {
 
     @Test
     public void testSetAttribute() throws Exception {
-        int value = 42;
-        Attribute attribute = new Attribute("integer", new Integer(value));
+        int answer = 42;
+        Attribute attribute = new Attribute("integer", Integer.valueOf(answer));
         introspectedMBean.setAttribute(attribute);
-        assertEquals(value, annotatedMBean.integer);
+        assertEquals(answer, annotatedMBean.integer);
     }
 
     @Test
     public void testSetAttributes() {
-        fail("Not yet implemented");
+        int answer = 42;
+        AttributeList attributes = new AttributeList();
+        attributes.add(new Attribute("integer", Integer.valueOf(answer)));
+        introspectedMBean.setAttributes(attributes);
+        assertEquals(answer, annotatedMBean.integer);
     }
 
     @Test
