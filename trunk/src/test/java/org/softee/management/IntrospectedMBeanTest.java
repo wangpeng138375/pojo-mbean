@@ -17,13 +17,18 @@ import org.junit.Test;
 public class IntrospectedMBeanTest {
     private DummyAnnotatedMbean annotatedMBean;
     private DynamicMBean introspectedMBean;
+    private DynamicMBeanValidator validator = new DynamicMBeanValidator();
 
     @Before
     public void before() throws Exception, java.beans.IntrospectionException {
         annotatedMBean = new DummyAnnotatedMbean();
-        introspectedMBean = new IntrospectedMBean(annotatedMBean);
+        introspectedMBean = new IntrospectedDynamicMBean(annotatedMBean);
     }
 
+    @Test
+    public void testValidate() {
+        validator.validateDynamicMBean(introspectedMBean);
+    }
     @Test
     public void testGetAttribute() throws Exception {
         Object attribute = introspectedMBean.getAttribute("string");

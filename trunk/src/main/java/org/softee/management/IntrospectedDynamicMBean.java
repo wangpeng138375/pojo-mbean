@@ -23,13 +23,20 @@ import javax.management.MBeanException;
 import javax.management.MBeanInfo;
 import javax.management.MBeanNotificationInfo;
 import javax.management.MBeanOperationInfo;
+import javax.management.MBeanParameterInfo;
 import javax.management.ReflectionException;
 
 import org.softee.management.annotation.MBean;
 import org.softee.management.annotation.Operation;
+import org.softee.management.annotation.Parameter;
 import org.softee.management.annotation.Property;
-
-public class IntrospectedMBean implements DynamicMBean {
+/**
+ * A DynamicMBean that can introspect an annotated POJO bean and expose it as a DynamicMBean
+ *  
+ * @author morten.hattesen@gmail.com
+ *
+ */
+public class IntrospectedDynamicMBean implements DynamicMBean {
     private final Object mbean;
     private final Class<?> mbeanType;
     private final MBeanInfo mbeanInfo;
@@ -42,7 +49,7 @@ public class IntrospectedMBean implements DynamicMBean {
      * @throws IntrospectionException
      * @throws javax.management.IntrospectionException
      */
-    public IntrospectedMBean(Object mbean) throws javax.management.IntrospectionException, IntrospectionException {
+    public IntrospectedDynamicMBean(Object mbean) throws javax.management.IntrospectionException, IntrospectionException {
         this.mbean = mbean;
         this.mbeanType = mbean.getClass();
         if (!mbeanType.isAnnotationPresent(MBean.class)) {
@@ -177,18 +184,22 @@ public class IntrospectedMBean implements DynamicMBean {
     }
 
     /**
-     * FIXME: Allow multiple matches for each name (overloaded)
-     * The methods that constitute the operations made available.
-     * @return
+     * TODO: Allow multiple matches for each (overloaded) method name
+     * 
+     * @return The methods that constitute the operations
+     * @throws IllegalStateException if multiple Operation annotations exist on identically named (overloaded) methods
      */
     private Map<String, Method> operationMethods() {
         Map<String, Method> operationMethods = new HashMap<String, Method>();
         for (MethodDescriptor descriptor : beanInfo.getMethodDescriptors()) {
             Method method = descriptor.getMethod();
-            Operation operation = getAnnotation(Operation.class, method);
-            if (operation != null) {
+            Operation annotation = getAnnotation(Operation.class, method);
+            if (annotation != null) {
                 // This method is an operation
-                operationMethods.put(method.getName(), method);
+                Method old = operationMethods.put(method.getName(), method);
+                if (old != null) {
+                    throw new IllegalStateException("Multiple Operation annotations for operation " + method.getName());
+                }
             }
         }
         return operationMethods;
@@ -196,12 +207,63 @@ public class IntrospectedMBean implements DynamicMBean {
 
     private MBeanOperationInfo[] operationInfo() {
         MBeanOperationInfo[] operationInfos = new MBeanOperationInfo[operationMethods.size()];
-        int i = 0;
+        int operationIndex = 0;
         for (Method method : operationMethods.values()) {
-            Operation description = getAnnotation(Operation.class, method);
-            operationInfos[i++] = new MBeanOperationInfo(description.value(), method);
+            Operation annotation = getAnnotation(Operation.class, method);
+            // add description and names to parameters
+            MBeanParameterInfo[] signature = parameterInfo(method);
+            // add description and parameter info to operation method
+            MBeanOperationInfo opInfo = new MBeanOperationInfo(
+                    method.getName(), 
+                    annotation.value(), 
+                    signature, 
+                    method.getReturnType().getName(),
+                    MBeanOperationInfo.UNKNOWN,
+                    null);
+            operationInfos[operationIndex++] = opInfo;
         }
         return operationInfos;
+    }
+
+
+    protected MBeanParameterInfo[] parameterInfo(Method method) {
+        MBeanParameterInfo[] parameters = new MBeanParameterInfo[method.getParameterTypes().length];
+        for (int parameterIndex = 0; parameterIndex < parameters.length; parameterIndex++) {
+            final String pType = method.getParameterTypes()[parameterIndex].getName();
+            final String pName;
+            final String pDesc;
+            // locate parameter annotation
+            Parameter annotation = getParameterAnnotation(method, parameterIndex, Parameter.class);
+            if (annotation != null) {
+                // a parameter annotation exists
+                pName = annotation.name(); 
+                pDesc = annotation.description();
+            } else {
+                pName = "p" + (parameterIndex + 1); // 1 .. n
+                pDesc = "";
+            }
+            parameters[parameterIndex] = new MBeanParameterInfo(pName, pType, pDesc);
+        }
+        return parameters;
+    }
+    
+    /**
+     * Find an annotation for a parameter on a method.
+     * 
+     * @param <A> The annotation.
+     * @param method The method.
+     * @param index The index (0 .. n-1) of the parameter in the parameters list
+     * @param annotationClass The annotation class
+     * @return The annotation, or null
+     */
+    private static <A extends Annotation> A getParameterAnnotation(Method method,
+            int index,
+            Class<A> annotationClass) {
+        for (Annotation a : method.getParameterAnnotations()[index]) {
+            if (annotationClass.isInstance(a))
+                return annotationClass.cast(a);
+        }
+        return null;
     }
 
     private MBeanConstructorInfo[] constructorInfo() {
