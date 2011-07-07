@@ -7,6 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * Adds description to a parameter of an MBean operation
+ * 
  * @author morten.hattesen@gmail.com
  *
  */

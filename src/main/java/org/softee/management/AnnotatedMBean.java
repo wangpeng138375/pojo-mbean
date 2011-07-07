@@ -5,9 +5,14 @@ import java.util.Date;
 import javax.management.DynamicMBean;
 import javax.management.IntrospectionException;
 
-import org.softee.management.annotation.Property;
 import org.softee.management.annotation.MBean;
+import org.softee.management.annotation.Property;
 
+/**
+ * 
+ * @author morten.hattesen@gmail.com
+ *
+ */
 @MBean("A Basic Annotated MBean implementation")
 public class AnnotatedMBean {
     private final Object monitored;
@@ -26,6 +31,6 @@ public class AnnotatedMBean {
     }
 
     protected void registerMBean() throws IntrospectionException, java.beans.IntrospectionException {
-        DynamicMBean mbean = new IntrospectedMBean(monitored);
+        DynamicMBean mbean = new IntrospectedDynamicMBean(monitored);
     }
 }

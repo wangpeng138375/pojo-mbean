@@ -52,15 +52,17 @@ import org.softee.management.annotation.Property;
  *      this.number = number;
  *  }
  *  </pre>
+ *  
+ * @author morten.hattesen@gmail.com
  */
 @MBean("Generic MBean for monitoring input/output processing")
-public class ProcessingPojoMBean {
+public class ProcessingPojoMBean extends AbstractPojoMBean {
     private static final long NONE = Long.MIN_VALUE;
     private final DatatypeFactory dtf;
     private final String instanceName;
     
     private AtomicLong inputCount;
-    private AtomicLong inputLatestLatest;
+    private AtomicLong inputLatest;
 
     private AtomicLong outputCount;
     private AtomicLong outputLatest;
@@ -103,7 +105,7 @@ public class ProcessingPojoMBean {
     }
 
     private ObjectName createObjectName(Object instance, String instanceName) throws MalformedObjectNameException {
-        return new ObjectName(getClass().getPackage() + ":name=" + instanceName + ",type=" + instance.getClass().getName());
+        return new ObjectName(getClass().getPackage().getName() + ":name=" + instanceName + ",type=" + instance.getClass().getName());
     }
 
     /**
@@ -128,7 +130,7 @@ public class ProcessingPojoMBean {
      */
     public synchronized void notifyInput() {
         inputCount.incrementAndGet();
-        inputLatestLatest.set(now());
+        inputLatest.set(now());
     }
 
     /**
@@ -137,8 +139,16 @@ public class ProcessingPojoMBean {
      * The duration will be invalid this MBean is notified from multiple threads. 
      */
     public synchronized void notifyOutput() {
-        long durationMillis = (inputLatestLatest != null) ? now() - inputLatestLatest.get() : 0;
-        notifyOutput(durationMillis);
+        long latest = inputLatest.get();
+        if (latest == NONE) {
+            /* This can only be caused by...
+             * 1. notifyStop() without preceding notifyStart()
+             * 2. a call to reset() since last notifyStart()
+             */
+            notifyOutput(0);
+        } else {
+            notifyOutput(now() - latest);
+        }
     }
 
     /**
@@ -146,9 +156,8 @@ public class ProcessingPojoMBean {
      * @param durationMillis The duration of the processing in milliseconds
      */
     public synchronized void notifyOutput(long durationMillis) {
-        if (durationMillis < 0) {
-            throw new IllegalArgumentException("Negative duration: " + durationMillis);
-        }
+        durationMillis = Math.max(0, durationMillis);
+
         outputLatest.set(now());
         outputCount.incrementAndGet();
         durationLastMillis.set(durationMillis);
@@ -196,7 +205,7 @@ public class ProcessingPojoMBean {
     @Operation("Reset the monitor statistics")
     public synchronized void reset() {
         started = none();
-        inputLatestLatest = none();
+        inputLatest = none();
         outputLatest = none();
         failedLatest = none();
         inputCount = zero();
@@ -219,13 +228,13 @@ public class ProcessingPojoMBean {
     }
 
     @Property("Time of last received message")
-    public String getInputLatestLatest() {
-        return dateString(noneAsNull(inputLatestLatest));
+    public String getInputLatest() {
+        return dateString(noneAsNull(inputLatest));
     }
 
     @Property("Time since latest received message (seconds)")
     public Long getReceivedLatestAgeSeconds() {
-        return age(noneAsNull(inputLatestLatest), SECONDS);
+        return age(noneAsNull(inputLatest), SECONDS);
     }
 
 
@@ -332,7 +341,7 @@ public class ProcessingPojoMBean {
      */
     protected void register() throws ManagementException {
         try {
-            mBeanServer.registerMBean(new IntrospectedMBean(this), mBeanObjectName);
+            mBeanServer.registerMBean(new IntrospectedDynamicMBean(this), mBeanObjectName);
         } catch (Exception e) {
             throw new ManagementException(e);
         }
@@ -395,6 +404,10 @@ public class ProcessingPojoMBean {
         return new AtomicLong();
     }
 
+    protected boolean isNone(AtomicLong x) {
+        return x.get() == NONE;
+    }
+    
     protected AtomicLong none() {
         return new AtomicLong(NONE);
     }

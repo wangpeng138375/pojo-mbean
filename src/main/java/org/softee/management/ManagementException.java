@@ -1,5 +1,9 @@
 package org.softee.management;
-
+/**
+ * 
+ * @author morten.hattesen@gmail.com
+ *
+ */
 public class ManagementException extends Exception {
     private static final long serialVersionUID = 1L;
 
