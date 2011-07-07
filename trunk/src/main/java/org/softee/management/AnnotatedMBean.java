@@ -3,7 +3,10 @@ package org.softee.management;
 import java.util.Date;
 
 import javax.management.DynamicMBean;
+import javax.management.IntrospectionException;
 import javax.management.MXBean;
+
+import org.softee.management.annotation.Description;
 
 @MXBean
 @Description("A Basic Annotated MBean implementation")
@@ -23,7 +26,7 @@ public class AnnotatedMBean {
         return created;
     }
 
-    protected void registerMBean() {
+    protected void registerMBean() throws IntrospectionException, java.beans.IntrospectionException {
         DynamicMBean mbean = new IntrospectedMBean(monitored);
     }
 }
