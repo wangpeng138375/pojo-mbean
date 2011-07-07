@@ -1,4 +1,4 @@
-package org.softee.management;
+package org.softee.management.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
