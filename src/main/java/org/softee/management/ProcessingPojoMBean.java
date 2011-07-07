@@ -148,7 +148,7 @@ public class ProcessingPojoMBean extends AbstractPojoMBean {
     }
 
     @Override
-    @Operation("Reset the statistics")
+    @Operation(value = "Reset the statistics", impact = Operation.Impact.ACTION)
     public synchronized void reset() {
         super.reset();
         started = none();
@@ -176,7 +176,7 @@ public class ProcessingPojoMBean extends AbstractPojoMBean {
     }
 
     @Property("Time since latest received message (seconds)")
-    public Long getReceivedLatestAgeSeconds() {
+    public Long getInputLatestAgeSeconds() {
         return age(noneAsNull(inputLatest), SECONDS);
     }
 
@@ -187,17 +187,17 @@ public class ProcessingPojoMBean extends AbstractPojoMBean {
     }
 
     @Property("Time of the latest processed message")
-    public String getProcessedLatest() {
+    public String getOutputLatest() {
         return dateString(noneAsNull(outputLatest));
    }
 
     @Property("Time since latest processed message (seconds)")
-    public Long getProcessedLatestAgeSeconds() {
+    public Long getOutputLatestAgeSeconds() {
         return age(noneAsNull(outputLatest), SECONDS);
     }
 
     @Property("Processing time of the latest message (ms)")
-    public Long getProcessedDurationLatestMillis() {
+    public Long getDurationLatestMillis() {
         return noneAsNull(durationLastMillis);
     }
 
@@ -207,7 +207,7 @@ public class ProcessingPojoMBean extends AbstractPojoMBean {
     }
 
     @Property("Average processing time (ms)")
-    public Long getProcessedDurationAverageMillis() {
+    public Long getDurationAverageMillis() {
         long processedDurationTotalMillis = getDurationTotalMillis();
         long processedCount = getOutputCount();
         return (processedCount != 0) ? processedDurationTotalMillis/processedCount : null;

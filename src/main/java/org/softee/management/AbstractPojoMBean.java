@@ -20,7 +20,6 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.softee.management.annotation.Operation;
-import org.softee.management.annotation.Property;
 import org.softee.management.helper.IntrospectedDynamicMBean;
 
 /**
@@ -52,12 +51,12 @@ public abstract class AbstractPojoMBean {
         reset();
     }
 
-    @Operation("Reset the MBean")
+    @Operation(value = "Reset the MBean", impact = Operation.Impact.ACTION)
     public void reset() {
         // Nothing to reset. Shouldn't reset the start time
     }
 
-    @Property("Name of this instance")
+    //@Property("Name of this instance")
     public String getName() {
         return instanceName;
     }
