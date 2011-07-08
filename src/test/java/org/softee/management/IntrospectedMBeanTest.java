@@ -1,7 +1,6 @@
 package org.softee.management;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
@@ -77,8 +76,10 @@ public class IntrospectedMBeanTest {
     }
 
     @Test
-    public void testInvoke() {
-        fail("Not yet implemented");
+    public void testInvoke() throws Exception {
+        String arg0 = "Lorem Ipsum";
+        introspectedMBean.invoke("voidOneArgOperation", new Object[] {arg0}, new String[] {"java.lang.String"});
+        assertEquals(arg0, annotatedMBean.operationArgument);
     }
 
 }
