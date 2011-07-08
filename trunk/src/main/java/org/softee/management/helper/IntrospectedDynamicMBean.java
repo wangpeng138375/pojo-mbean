@@ -34,36 +34,41 @@ import org.softee.management.annotation.Operation;
 import org.softee.management.annotation.Operation.Impact;
 import org.softee.management.annotation.Parameter;
 import org.softee.management.annotation.Property;
+import org.softee.management.exception.ManagementException;
 /**
  * A DynamicMBean that can introspect an annotated POJO bean and expose it as a DynamicMBean
- *  
+ *
  * @author morten.hattesen@gmail.com
  *
  */
 public class IntrospectedDynamicMBean implements DynamicMBean {
     private final Object mbean;
     private final Class<?> mbeanType;
-    private final MBeanInfo mbeanInfo;
-    private final BeanInfo beanInfo;
     private final Map<String, PropertyDescriptor> propertyDescriptors;
     private final Map<String, Method> operationMethods;
+    private final MBeanInfo mbeanInfo;
 
     /** Constructs a Dynamic MBean by introspecting an annotated POJO MBean {@code annotatedMBean}
      * @param mbean the POJO MBean that should be exposed as a {@link javax.management.DynamicMBean}
-     * @throws IntrospectionException
-     * @throws javax.management.IntrospectionException
+     * @throws ManagementException if an exception occurs during the introspection of {@code mbean}
      */
-    public IntrospectedDynamicMBean(Object mbean) throws javax.management.IntrospectionException, IntrospectionException {
+    public IntrospectedDynamicMBean(Object mbean) throws ManagementException {
         this.mbean = mbean;
         this.mbeanType = mbean.getClass();
         if (!mbeanType.isAnnotationPresent(MBean.class)) {
             throw new IllegalArgumentException(
                     String.format("mbean type %s is not annotated with %s", mbean.getClass(), MBean.class));
         }
-        beanInfo = Introspector.getBeanInfo(mbeanType);
-        propertyDescriptors = createPropertyDescriptors();
-        operationMethods = createOperationMethods();
-        mbeanInfo = createMbeanInfo();
+        try {
+            BeanInfo beanInfo = Introspector.getBeanInfo(mbeanType);
+            propertyDescriptors = createPropertyDescriptors(beanInfo);
+            operationMethods = createOperationMethods(beanInfo);
+            mbeanInfo = createMbeanInfo();
+        } catch (IntrospectionException e) {
+            throw new ManagementException(e);
+        } catch (javax.management.IntrospectionException e) {
+            throw new ManagementException(e);
+        }
     }
 
 
@@ -137,7 +142,7 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
                 throw new IllegalArgumentException(e);
             }
         }
-        // TODO how come we have to return the values?
+        // It seems like an API mistake that we have to return the attributes
         return attributes;
     }
 
@@ -149,8 +154,8 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
     @Override
     public Object invoke(String actionName, Object[] params, String[] signature)
             throws MBeanException, ReflectionException {
-        //TODO check that the right signature is picked
         Method method = operationMethods.get(actionName);
+        //TODO verify that the right signature is picked
         try {
             return method.invoke(mbean, params);
         } catch (Exception e) {
@@ -181,19 +186,21 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
                 notificationInfo);
     }
 
-
+    /**
+     * TODO should this be implemented?
+     * @return null
+     */
     private MBeanNotificationInfo[] createNotificationInfo() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     /**
-     * TODO: Allow multiple matches for each (overloaded) method name
-     * 
+     * TODO: Consider allowing multiple matches for each (overloaded) method name
+     *
      * @return The methods that constitute the operations
-     * @throws IllegalStateException if multiple Operation annotations exist on identically named (overloaded) methods
+     * @throws ManagementException if multiple Operation annotations exist on identically named (overloaded) methods
      */
-    private Map<String, Method> createOperationMethods() {
+    private Map<String, Method> createOperationMethods(BeanInfo beanInfo) throws ManagementException {
         Map<String, Method> operationMethods = new HashMap<String, Method>();
         for (MethodDescriptor descriptor : beanInfo.getMethodDescriptors()) {
             Method method = descriptor.getMethod();
@@ -202,13 +209,16 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
                 // This method is an operation
                 Method old = operationMethods.put(method.getName(), method);
                 if (old != null) {
-                    throw new IllegalStateException("Multiple Operation annotations for operation " + method.getName());
+                    throw new ManagementException("Multiple Operation annotations for operation " + method.getName());
                 }
             }
         }
         return operationMethods;
     }
 
+    /**
+     * @return an MBeanOPerationInfo array that describes the @Operation annotated methods of the operationMethods
+     */
     private MBeanOperationInfo[] createOperationInfo() {
         MBeanOperationInfo[] operationInfos = new MBeanOperationInfo[operationMethods.size()];
         int operationIndex = 0;
@@ -222,9 +232,9 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
             Impact impact = (annotation.impact() != null) ? annotation.impact() : Impact.UNKNOWN;
             int impactValue = impact.impactValue;
             MBeanOperationInfo opInfo = new MBeanOperationInfo(
-                    method.getName(), 
-                    annotation.value(), 
-                    signature, 
+                    method.getName(),
+                    annotation.value(),
+                    signature,
                     method.getReturnType().getName(),
                     impactValue,
                     null);
@@ -244,8 +254,8 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
             Parameter annotation = getParameterAnnotation(method, parameterIndex, Parameter.class);
             if (annotation != null) {
                 // a parameter annotation exists
-                pName = annotation.name(); 
-                pDesc = annotation.description();
+                pName = annotation.name();
+                pDesc = annotation.value();
             } else {
                 pName = "p" + (parameterIndex + 1); // 1 .. n
                 pDesc = "";
@@ -254,10 +264,10 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
         }
         return parameters;
     }
-    
+
     /**
      * Find an annotation for a parameter on a method.
-     * 
+     *
      * @param <A> The annotation.
      * @param method The method.
      * @param index The index (0 .. n-1) of the parameter in the parameters list
@@ -265,8 +275,7 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
      * @return The annotation, or null
      */
     private static <A extends Annotation> A getParameterAnnotation(Method method,
-            int index,
-            Class<A> annotationClass) {
+            int index, Class<A> annotationClass) {
         for (Annotation a : method.getParameterAnnotations()[index]) {
             if (annotationClass.isInstance(a))
                 return annotationClass.cast(a);
@@ -274,18 +283,21 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
         return null;
     }
 
+    /**
+     * TODO should this be implemented?
+     * @return null
+     */
     private MBeanConstructorInfo[] constructorInfo() {
-        // TODO Implement
         return null;
     }
 
     /**
      * @return all properties where getter or setter is annotated with {@link org.softee.management.annotation.Property}
      */
-    private Map<String, PropertyDescriptor> createPropertyDescriptors() {
+    private Map<String, PropertyDescriptor> createPropertyDescriptors(BeanInfo beanInfo) {
         Map<String, PropertyDescriptor> properties = new HashMap<String, PropertyDescriptor>();
         for (PropertyDescriptor property: beanInfo.getPropertyDescriptors()) {
-            Property attribute = getAnnotation(Property.class, 
+            Property attribute = getAnnotation(Property.class,
                         property.getReadMethod(), property.getWriteMethod());
             if (attribute != null) {
                 properties.put(property.getName(), property);
@@ -328,6 +340,7 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
         Collections.sort(keys);
         return keys;
     }
+
     /**
      *
      * @param <T>
