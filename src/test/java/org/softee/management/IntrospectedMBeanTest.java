@@ -69,7 +69,7 @@ public class IntrospectedMBeanTest {
     public void testGetMBeanInfo() {
         MBeanInfo mBeanInfo = introspectedMBean.getMBeanInfo();
         MBeanAttributeInfo[] attributes = mBeanInfo.getAttributes();
-        assertEquals("Number of attributes", 2, attributes.length);
+        assertEquals("Number of attributes", 3, attributes.length);
         assertEquals(annotatedMBean.getClass().getSimpleName(), mBeanInfo.getDescription());
         MBeanOperationInfo[] operations = mBeanInfo.getOperations();
         assertEquals("Number of operations", 1, operations.length);
