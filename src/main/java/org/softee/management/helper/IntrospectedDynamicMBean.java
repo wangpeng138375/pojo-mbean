@@ -1,7 +1,6 @@
 package org.softee.management.helper;
 
 import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.MethodDescriptor;
 import java.beans.PropertyDescriptor;
@@ -19,6 +18,7 @@ import javax.management.Attribute;
 import javax.management.AttributeList;
 import javax.management.AttributeNotFoundException;
 import javax.management.DynamicMBean;
+import javax.management.IntrospectionException;
 import javax.management.InvalidAttributeValueException;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanConstructorInfo;
@@ -66,7 +66,7 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
             mbeanInfo = createMbeanInfo();
         } catch (IntrospectionException e) {
             throw new ManagementException(e);
-        } catch (javax.management.IntrospectionException e) {
+        } catch (java.beans.IntrospectionException e) {
             throw new ManagementException(e);
         }
     }
@@ -169,8 +169,10 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
      * @return an MBeanInfo created by introspecting the {@code mbean}
      * @throws IntrospectionException
      * @throws javax.management.IntrospectionException
+     * @throws javax.management.IntrospectionException
+     * @throws ManagementException
      */
-    private MBeanInfo createMbeanInfo() throws javax.management.IntrospectionException, IntrospectionException {
+    private MBeanInfo createMbeanInfo() throws IntrospectionException, javax.management.IntrospectionException, ManagementException {
         MBean annotation = mbean.getClass().getAnnotation(MBean.class);
         final String description = annotation.value();
         final MBeanAttributeInfo[] attributeInfo = createAttributeInfo();
@@ -297,16 +299,16 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
     private Map<String, PropertyDescriptor> createPropertyDescriptors(BeanInfo beanInfo) {
         Map<String, PropertyDescriptor> properties = new HashMap<String, PropertyDescriptor>();
         for (PropertyDescriptor property: beanInfo.getPropertyDescriptors()) {
-            Property attribute = getAnnotation(Property.class,
+            Property annotation = getAnnotation(Property.class,
                         property.getReadMethod(), property.getWriteMethod());
-            if (attribute != null) {
+            if (annotation != null) {
                 properties.put(property.getName(), property);
             }
         }
         return properties;
     }
 
-    private MBeanAttributeInfo[] createAttributeInfo() throws IntrospectionException, javax.management.IntrospectionException {
+    private MBeanAttributeInfo[] createAttributeInfo() throws ManagementException, IntrospectionException {
         MBeanAttributeInfo[] infos = new MBeanAttributeInfo[propertyDescriptors.size()];
         int i = 0;
         // we should iterate over properties sorted by name
@@ -314,13 +316,13 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
             PropertyDescriptor property = propertyDescriptors.get(propertyName);
             Method readMethod = property.getReadMethod();
             if (readMethod != null && readMethod.getParameterTypes().length != 0) {
-                throw new IntrospectionException(
+                throw new ManagementException(
                         String.format("Getter method %s of class %s has > 0 parameters (does not follow beanspec)",
                                 readMethod.getName(), readMethod.getDeclaringClass()));
             }
             Method writeMethod = property.getWriteMethod();
             if (writeMethod != null && writeMethod.getParameterTypes().length != 1) {
-                throw new IntrospectionException(
+                throw new ManagementException(
                         String.format("Setter method %s of class %s has != 1 parameters (does not follow beanspec)",
                                 writeMethod.getName(), writeMethod.getDeclaringClass()));
             }
