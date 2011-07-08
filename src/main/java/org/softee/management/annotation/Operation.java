@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * Annotation for MBean operation methods.<p>
- * 
+ *
  * @author morten.hattesen@gmail.com
  */
 @Retention(RetentionPolicy.RUNTIME)
@@ -15,8 +15,6 @@ import java.lang.annotation.Target;
 public @interface Operation {
     /**
      * The impact of this operation
-     * @author extdivmoha
-     *
      */
     public enum Impact {INFO(0), ACTION(1), ACTION_INFO(2), UNKNOWN(3);
         public final int impactValue;
@@ -24,12 +22,12 @@ public @interface Operation {
             this.impactValue = impactValue;
         }
     }
-    
+
     /**
      * @return the textual description of the attribute to be displayed by the management agent
      */
-    String value();
-    
+    String value() default "";
+
     /**
      * @resturn The impact of this operation
      */

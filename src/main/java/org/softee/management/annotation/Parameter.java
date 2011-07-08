@@ -6,8 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Adds description to a parameter of an MBean operation
- * 
+ * Adds description and name to a parameter of an MBean operation.<p>
+ * If no annotation is associates with the parameter, a default name "px" is provided, where "x" is the argument index (1 .. n),
+ * e.g. "p1", "p2", ...
+ *
  * @author morten.hattesen@gmail.com
  *
  */
@@ -15,14 +17,13 @@ import java.lang.annotation.Target;
 @Target({ElementType.PARAMETER})
 public @interface Parameter {
     /**
-     *
-     * @return name of the parameter
+     * @return Optional description of the parameter
+     */
+    String value() default "";
+
+    /**
+     * @return name of the parameter.
      */
     String name();
 
-    /**
-     *
-     * @return description of the parameter
-     */
-    String description();
 }
