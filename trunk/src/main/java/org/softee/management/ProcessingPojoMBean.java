@@ -38,18 +38,18 @@ import org.softee.management.annotation.Property;
  *      this.number = number;
  *  }
  *  </pre>
- *  
+ *
  * @author morten.hattesen@gmail.com
  */
 @MBean("Generic MBean for monitoring input/output processing")
 public class ProcessingPojoMBean extends AbstractPojoMBean {
-    
+
     private AtomicLong inputCount;
     private AtomicLong inputLatest;
 
     private AtomicLong outputCount;
     private AtomicLong outputLatest;
-    
+
     private AtomicLong durationLastMillis;
     private AtomicLong durationTotalMillis;
     private AtomicLong durationMaxMillis;
@@ -62,7 +62,7 @@ public class ProcessingPojoMBean extends AbstractPojoMBean {
     public ProcessingPojoMBean(Class<?> type, String name) throws MalformedObjectNameException {
         super(type, name);
     }
-    
+
     public ProcessingPojoMBean(Package domain, Class<?> type, String name) throws MalformedObjectNameException {
         super(domain, type, name);
     }
@@ -78,7 +78,7 @@ public class ProcessingPojoMBean extends AbstractPojoMBean {
     /**
      * Notify that a message has been successfully processed (output), and automatically set the processing duration
      * to the duration since the most recent call to {@link #notifyInput()}.
-     * The duration will be invalid this MBean is notified from multiple threads. 
+     * The duration will be invalid this MBean is notified from multiple threads.
      */
     public synchronized void notifyOutput() {
         long latest = inputLatest.get();
@@ -155,7 +155,7 @@ public class ProcessingPojoMBean extends AbstractPojoMBean {
         durationTotalMillis = zero();
     }
 
-    
+
     @Property("Number of messages received")
     public long getInputCount() {
         return inputCount.get();
@@ -236,13 +236,13 @@ public class ProcessingPojoMBean extends AbstractPojoMBean {
         }
         return failedLatestCause.toString();
     }
-    
+
     /**
-     * TODO Neither a multiline string, nor a String array seems to be displayed in a proper way.
-     * If required, look into presenting in a composite or tabular form (see {@link javax.management.MXBean})
-     * 
-     * @Description("The failure stacktrace of the latest failed message processing")
+     * TODO Presentation of multi-line content isn't elegant. But in the JConsole, by double-clocking on a String array,
+     * the elements will be presented one-per-line.<p>
+     * If required, look into presenting in a composite or tabular form (see {@link javax.management.MXBean}
      */
+    @Property("The failure stacktrace of the latest failed message processing (one line per element)")
     public String[] getFailedLatestStacktrace() {
         if (failedLatestCause == null) {
             return null;
