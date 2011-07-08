@@ -15,6 +15,7 @@ import javax.management.MalformedObjectNameException;
 import org.softee.management.annotation.MBean;
 import org.softee.management.annotation.Operation;
 import org.softee.management.annotation.Property;
+import org.softee.management.exception.ManagementException;
 
 /**
  *  Helper class for implementing commonly monitored metrics in a message processing system.

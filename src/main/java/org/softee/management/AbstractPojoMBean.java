@@ -21,6 +21,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.softee.management.annotation.Operation;
 import org.softee.management.annotation.Property;
+import org.softee.management.exception.ManagementException;
 import org.softee.management.helper.IntrospectedDynamicMBean;
 
 /**
