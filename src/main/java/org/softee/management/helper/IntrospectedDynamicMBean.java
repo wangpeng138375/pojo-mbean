@@ -9,7 +9,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.management.Attribute;
@@ -57,10 +60,10 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
             throw new IllegalArgumentException(
                     String.format("mbean type %s is not annotated with %s", mbean.getClass(), MBean.class));
         }
-        this.beanInfo = Introspector.getBeanInfo(mbeanType);
-        this.propertyDescriptors = propertyDescriptors();
-        this.operationMethods = operationMethods();
-        mbeanInfo = mbeanInfo();
+        beanInfo = Introspector.getBeanInfo(mbeanType);
+        propertyDescriptors = createPropertyDescriptors();
+        operationMethods = createOperationMethods();
+        mbeanInfo = createMbeanInfo();
     }
 
 
@@ -162,12 +165,12 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
      * @throws IntrospectionException
      * @throws javax.management.IntrospectionException
      */
-    private MBeanInfo mbeanInfo() throws javax.management.IntrospectionException, IntrospectionException {
+    private MBeanInfo createMbeanInfo() throws javax.management.IntrospectionException, IntrospectionException {
         MBean annotation = mbean.getClass().getAnnotation(MBean.class);
         final String description = annotation.value();
-        final MBeanAttributeInfo[] attributeInfo = attributeInfo();
+        final MBeanAttributeInfo[] attributeInfo = createAttributeInfo();
         final MBeanConstructorInfo[] constructorInfo = constructorInfo();
-        final MBeanOperationInfo[] operationInfo = operationInfo();
+        final MBeanOperationInfo[] operationInfo = createOperationInfo();
         final MBeanNotificationInfo[] notificationInfo = createNotificationInfo();
         return new MBeanInfo(
                 mbean.getClass().getName(),
@@ -190,7 +193,7 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
      * @return The methods that constitute the operations
      * @throws IllegalStateException if multiple Operation annotations exist on identically named (overloaded) methods
      */
-    private Map<String, Method> operationMethods() {
+    private Map<String, Method> createOperationMethods() {
         Map<String, Method> operationMethods = new HashMap<String, Method>();
         for (MethodDescriptor descriptor : beanInfo.getMethodDescriptors()) {
             Method method = descriptor.getMethod();
@@ -206,13 +209,15 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
         return operationMethods;
     }
 
-    private MBeanOperationInfo[] operationInfo() {
+    private MBeanOperationInfo[] createOperationInfo() {
         MBeanOperationInfo[] operationInfos = new MBeanOperationInfo[operationMethods.size()];
         int operationIndex = 0;
-        for (Method method : operationMethods.values()) {
+        // Iterate in method name order
+        for (String methodName : sortedKeys(operationMethods)) {
+            Method method = operationMethods.get(methodName);
             Operation annotation = getAnnotation(Operation.class, method);
             // add description and names to parameters
-            MBeanParameterInfo[] signature = parameterInfo(method);
+            MBeanParameterInfo[] signature = createParameterInfo(method);
             // add description and parameter info to operation method
             Impact impact = (annotation.impact() != null) ? annotation.impact() : Impact.UNKNOWN;
             int impactValue = impact.impactValue;
@@ -229,7 +234,7 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
     }
 
 
-    protected MBeanParameterInfo[] parameterInfo(Method method) {
+    protected MBeanParameterInfo[] createParameterInfo(Method method) {
         MBeanParameterInfo[] parameters = new MBeanParameterInfo[method.getParameterTypes().length];
         for (int parameterIndex = 0; parameterIndex < parameters.length; parameterIndex++) {
             final String pType = method.getParameterTypes()[parameterIndex].getName();
@@ -270,14 +275,14 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
     }
 
     private MBeanConstructorInfo[] constructorInfo() {
-        // TODO Auto-generated method stub
+        // TODO Implement
         return null;
     }
 
     /**
      * @return all properties where getter or setter is annotated with {@link org.softee.management.annotation.Property}
      */
-    private Map<String, PropertyDescriptor> propertyDescriptors() {
+    private Map<String, PropertyDescriptor> createPropertyDescriptors() {
         Map<String, PropertyDescriptor> properties = new HashMap<String, PropertyDescriptor>();
         for (PropertyDescriptor property: beanInfo.getPropertyDescriptors()) {
             Property attribute = getAnnotation(Property.class, 
@@ -289,10 +294,12 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
         return properties;
     }
 
-    private MBeanAttributeInfo[] attributeInfo() throws IntrospectionException, javax.management.IntrospectionException {
+    private MBeanAttributeInfo[] createAttributeInfo() throws IntrospectionException, javax.management.IntrospectionException {
         MBeanAttributeInfo[] infos = new MBeanAttributeInfo[propertyDescriptors.size()];
         int i = 0;
-        for (PropertyDescriptor property: propertyDescriptors.values()) {
+        // we should iterate over properties sorted by name
+        for (String propertyName : sortedKeys(propertyDescriptors)) {
+            PropertyDescriptor property = propertyDescriptors.get(propertyName);
             Method readMethod = property.getReadMethod();
             if (readMethod != null && readMethod.getParameterTypes().length != 0) {
                 throw new IntrospectionException(
@@ -316,7 +323,11 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
         return infos;
     }
 
-
+    private List<String> sortedKeys(Map<String, ?> map) {
+        List<String> keys = new ArrayList<String>(map.keySet());
+        Collections.sort(keys);
+        return keys;
+    }
     /**
      *
      * @param <T>
