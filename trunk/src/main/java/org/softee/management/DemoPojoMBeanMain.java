@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 import org.softee.time.StopWatch;
 
 public class DemoPojoMBeanMain implements Runnable {
-    private static final int DEMO_PROCESSING_TIME_MILLIS = 1000;
+    private static final int DEMO_PROCESSING_TIME_MILLIS = 10000;
     private ProcessingPojoMBean monitor;
     
     public DemoPojoMBeanMain() {
