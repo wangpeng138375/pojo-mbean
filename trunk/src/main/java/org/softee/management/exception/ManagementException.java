@@ -1,4 +1,4 @@
-package org.softee.management;
+package org.softee.management.exception;
 /**
  * 
  * @author morten.hattesen@gmail.com
