@@ -5,11 +5,11 @@ import java.util.concurrent.TimeUnit;
 import org.softee.time.StopWatch;
 
 public class DemoPojoMBeanMain implements Runnable {
-    private static final int DEMO_PROCESSING_TIME_MILLIS = 10000;
+    private static final int DEMO_PROCESSING_TIME_MILLIS = 1000;
     private ProcessingPojoMBean monitor;
-    
+
     public DemoPojoMBeanMain() {
-        
+
     }
 
     @Override
@@ -23,14 +23,14 @@ public class DemoPojoMBeanMain implements Runnable {
             e.printStackTrace();
         }
     }
-    
+
     public void start() throws Exception {
         monitor.start();
     }
     public void shutdown() throws Exception {
         monitor.stop();
     }
-    
+
     public static void main(String[] args) {
         new DemoPojoMBeanMain().run();
     }
@@ -57,18 +57,18 @@ public class DemoPojoMBeanMain implements Runnable {
             // empty by design
         }
     }
-    
+
     private void log(int count, String suffix) {
         String msgSuffix = (suffix == null) ? "" : " (" + suffix + ")";
         String msg = String.format("message #%d%s", count, msgSuffix);
         System.out.println(msg);
     }
-    
+
     private Throwable dummyThrowable(int count) {
         Exception e = new Exception("Wrapped failure, message #" + count);
         // return new DummyException("Failed message #" + count, e); FIXME DummyException is a test source
         return new Exception("Failed message #" + count, e);
-        
+
     }
 
 }
