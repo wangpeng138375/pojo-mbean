@@ -59,15 +59,12 @@ public class ProcessingPojoMBean extends AbstractPojoMBean {
     private AtomicLong failedLatest;
     private Throwable failedLatestCause;
 
-    /**
-     * Create a monitor
-     * @param monitored the class that is monitored, used for identifying the MBean in the JConsole or JMX Console
-     * @param instanceName instanceName, used for identifying the MBean in the JConsole or JMX Console
-     * @throws MalformedObjectNameException 
-     * @throws RuntimeException if the monitor could not be created
-     */
-    public ProcessingPojoMBean(Object monitored, String instanceName) throws MalformedObjectNameException {
-        super(monitored, instanceName);
+    public ProcessingPojoMBean(Class<?> type, String name) throws MalformedObjectNameException {
+        super(type, name);
+    }
+    
+    public ProcessingPojoMBean(Package domain, Class<?> type, String name) throws MalformedObjectNameException {
+        super(domain, type, name);
     }
 
     /**
@@ -136,22 +133,16 @@ public class ProcessingPojoMBean extends AbstractPojoMBean {
         failedLatestCause = cause;
     }
 
-    @Property("The time when the monitor was started")
-    public String getStarted() {
-        return dateString(noneAsNull(started));
-    }
-
-    // Used for debugging @Description("Unregister and then register the MXBean monitor")
+    // Used for debugging @Operation("Unregister and then register the MXBean monitor")
     public void reregisterMonitor() throws ManagementException {
         unregister();
         register();
     }
 
     @Override
-    @Operation(value = "Reset the statistics", impact = Operation.Impact.ACTION)
+    @Operation(value = "Reset the accumulated statistics", impact = Operation.Impact.ACTION)
     public synchronized void reset() {
         super.reset();
-        started = none();
         inputLatest = none();
         outputLatest = none();
         failedLatest = none();
@@ -159,9 +150,9 @@ public class ProcessingPojoMBean extends AbstractPojoMBean {
         outputCount = zero();
         failedCount = zero();
         durationLastMillis = none();
-        durationTotalMillis = zero();
         durationMinMillis = none();
         durationMaxMillis = none();
+        durationTotalMillis = zero();
     }
 
     

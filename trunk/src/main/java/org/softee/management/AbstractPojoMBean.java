@@ -20,6 +20,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.softee.management.annotation.Operation;
+import org.softee.management.annotation.Property;
 import org.softee.management.helper.IntrospectedDynamicMBean;
 
 /**
@@ -29,40 +30,78 @@ import org.softee.management.helper.IntrospectedDynamicMBean;
  *
  */
 public abstract class AbstractPojoMBean {
-    static final long NONE = Long.MIN_VALUE;
-    private final String instanceName;
+    protected static final long NONE = Long.MIN_VALUE;
+    private final String name;
     private final DatatypeFactory dtf;
-    protected AtomicLong started;
     protected final MBeanServer mBeanServer;
-    protected ObjectName mBeanObjectName;
+    protected final ObjectName mBeanObjectName;
+    private AtomicLong started;
 
-    public AbstractPojoMBean(Object monitored, String instanceName) throws MalformedObjectNameException {
-        if (instanceName == null) {
-            throw new NullPointerException("instanceName");
+    /**
+     * @param type the type (class) of the MBean. The parent package is used as the domain of the MBean
+     * @param name the name of the MBean
+     * @throws MalformedObjectNameException
+     */
+    public AbstractPojoMBean(Class<?> type, String name) throws MalformedObjectNameException {
+        this(type.getPackage(), type, name);
+    }
+    
+    /**
+     * 
+     * @param domain the domain of the MBean
+     * @param type the type (class) of the MBean.
+     * @param name the name of the MBean
+     * @throws MalformedObjectNameException
+     */
+    public AbstractPojoMBean(Package domain, Class<?> type, String name) throws MalformedObjectNameException {
+        if (domain == null) {
+            throw new NullPointerException("monitoredPackage");
         }
-        this.instanceName = instanceName;
+        if (type == null) {
+            throw new NullPointerException("monitoredClass");
+        }
+        if (name == null) {
+            throw new NullPointerException("name");
+        }
+        this.name = name;
+        mBeanObjectName = createObjectName(domain.getName(), type, name);
         mBeanServer = ManagementFactory.getPlatformMBeanServer();
-        mBeanObjectName = createObjectName(monitored, instanceName);
+        
+        // XmlGregorianCalendar suport init
         try {
             dtf = DatatypeFactory.newInstance();
         } catch (DatatypeConfigurationException e) {
             throw new RuntimeException(e);
         }
+        
+        // Reset all stats
         reset();
     }
-
+    
     @Operation(value = "Reset the MBean", impact = Operation.Impact.ACTION)
     public void reset() {
-        // Nothing to reset. Shouldn't reset the start time
+        // Nothing to reset - shouldn't reset the start time
     }
 
-    //@Property("Name of this instance")
-    public String getName() {
-        return instanceName;
+    @Property("The time when the monitor was started")
+    public String getStarted() {
+        return dateString(noneAsNull(started));
     }
     
-    protected ObjectName createObjectName(Object instance, String instanceName) throws MalformedObjectNameException {
-        return new ObjectName(getClass().getPackage().getName() + ":name=" + instanceName + ",type=" + instance.getClass().getName());
+    public String getName() {
+        return name;
+    }
+    /**
+     * Constructs an objectName of the format:
+     * {@code <domain>:name=<name>,type=<type>}
+     * @param domain is the domain that is used for categorizing MBeans in a view
+     * @param type is the value bound to the "type" property of the MBean
+     * @param name is the value bound to the "name" property of the MBean
+     * @return an objectName constructed as above
+     * @throws MalformedObjectNameException
+     */
+    protected ObjectName createObjectName(String domain, Class<?> type, String name) throws MalformedObjectNameException {
+        return new ObjectName(domain + ":name=" + name + ",type=" + type.getName());
     }
 
     /**
@@ -70,8 +109,8 @@ public abstract class AbstractPojoMBean {
      * @throws ManagementException 
      */
     public void start() throws ManagementException {
+        started = new AtomicLong(now());
         register();
-        started.set(now());
     }
 
     /**
