@@ -66,7 +66,8 @@ public class DemoPojoMBeanMain implements Runnable {
     
     private Throwable dummyThrowable(int count) {
         Exception e = new Exception("Wrapped failure, message #" + count);
-        return new DummyException("Failed message #" + count, e);
+        // return new DummyException("Failed message #" + count, e); FIXME DummyException is a test source
+        return new Exception("Failed message #" + count, e);
         
     }
 
