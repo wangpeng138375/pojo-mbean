@@ -1,4 +1,4 @@
-package org.softee.management;
+package org.softee.management.helper;
 
 import java.lang.management.ManagementFactory;
 
@@ -13,7 +13,6 @@ import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 
 import org.softee.management.exception.ManagementException;
-import org.softee.management.helper.IntrospectedDynamicMBean;
 
 public class MBeanRegistration {
     private final Object mBean;
@@ -56,7 +55,7 @@ public class MBeanRegistration {
      * @throws MBeanRegistrationException
      * @throws InstanceAlreadyExistsException
      */
-    protected void register() throws ManagementException {
+    public void register() throws ManagementException {
         try {
             DynamicMBean dynamicMBean = new IntrospectedDynamicMBean(mBean);
             mBeanServer.registerMBean(dynamicMBean, mBeanObjectName);
@@ -71,7 +70,7 @@ public class MBeanRegistration {
      * @throws InstanceNotFoundException
      * @throws MBeanRegistrationException
      */
-    protected void unregister() throws ManagementException {
+    public void unregister() throws ManagementException {
         try {
             mBeanServer.unregisterMBean(mBeanObjectName);
         } catch (Exception e) {

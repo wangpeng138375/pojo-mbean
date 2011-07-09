@@ -15,6 +15,8 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import org.softee.management.annotation.ManagedOperation;
 import org.softee.management.annotation.ManagedAttribute;
 import org.softee.management.exception.ManagementException;
+import org.softee.management.helper.MBeanRegistration;
+import org.softee.management.helper.ObjectNameFactory;
 import org.softee.util.Preconditions;
 
 /**
@@ -25,7 +27,7 @@ import org.softee.util.Preconditions;
  * @author morten.hattesen@gmail.com
  *
  */
-public abstract class AbstractPojoMBean {
+public abstract class AbstractMBean {
     protected static final long NONE = Long.MIN_VALUE;
     private DatatypeFactory dtf;
     private AtomicLong started;
@@ -37,7 +39,7 @@ public abstract class AbstractPojoMBean {
      * @param mbeanName the name property of the ObjectName with which to override the name from the @MBean annotation
      * @throws MalformedObjectNameException if either domain, type or name is not specified
      */
-    public AbstractPojoMBean(String mbeanName) throws MalformedObjectNameException {
+    public AbstractMBean(String mbeanName) throws MalformedObjectNameException {
         ObjectName baseName = ObjectNameFactory.createObjectName(this);
         ObjectName objectName = ObjectNameFactory.replaceProperty(baseName, "name", Preconditions.notNull(mbeanName));
         registration = new MBeanRegistration(this, objectName);
@@ -48,7 +50,7 @@ public abstract class AbstractPojoMBean {
      * Construct an MBean using the objectName attribute of the @MBean annotation
      * @throws MalformedObjectNameException if either domain, type or name is not specified
      */
-    public AbstractPojoMBean() throws MalformedObjectNameException {
+    public AbstractMBean() throws MalformedObjectNameException {
         registration = new MBeanRegistration(this, ObjectNameFactory.createObjectName(this));
         initialize();
     }
@@ -58,7 +60,7 @@ public abstract class AbstractPojoMBean {
      * @param name the name of the MBean
      * @throws MalformedObjectNameException
      */
-    public AbstractPojoMBean(ObjectName objectName) {
+    public AbstractMBean(ObjectName objectName) {
         registration = new MBeanRegistration(this, objectName);
         initialize();
     }

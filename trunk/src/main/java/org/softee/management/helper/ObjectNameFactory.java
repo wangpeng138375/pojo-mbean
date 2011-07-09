@@ -1,4 +1,4 @@
-package org.softee.management;
+package org.softee.management.helper;
 
 import static java.lang.String.format;
 import static org.softee.util.Preconditions.notNull;
