@@ -1,5 +1,3 @@
-#Home of the pojo-mbean project
-
 = Introduction =
 
 This is the home page of the pojo-mbean project.
