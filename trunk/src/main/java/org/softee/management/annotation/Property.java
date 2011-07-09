@@ -21,7 +21,14 @@ import org.softee.management.annotation.Property.Access;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})
 public @interface Property {
-    public enum Access {READ, WRITE, READ_WRITE}
+    public enum Access {READ(true, false), WRITE(false, true), READ_WRITE(true, true);
+        public final boolean canRead;
+        public final boolean canWrite;
+        private Access(boolean canRead, boolean canWrite) {
+            this.canRead = canRead;
+            this.canWrite = canWrite;
+        }
+    }
 
     /**
      * @return the textual description of the operation to be displayed by the management agent
