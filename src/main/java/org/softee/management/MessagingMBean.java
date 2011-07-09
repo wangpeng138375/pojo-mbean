@@ -13,38 +13,19 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.management.MalformedObjectNameException;
 
 import org.softee.management.annotation.MBean;
-import org.softee.management.annotation.ManagedOperation;
 import org.softee.management.annotation.ManagedAttribute;
+import org.softee.management.annotation.ManagedOperation;
 import org.softee.management.exception.ManagementException;
 
 /**
- *  Helper class for implementing commonly monitored metrics in a message processing system.
- *  This class may be extended, and new metrics (attributes and operations) may be added by applying annotations.
- *
- *  <pre>
- *  private int number;
- *
- *  @Description("An operation that adds to number")
- *  public void addToNumber(@Parameter(name="add", value="An integer value to be added") int add){
- *      this.number :+ number;
- *  }
- *
- *  @Description("Number attribute")
- *  public int getNumber() {
- *      return number;
- *  }
- *
- *  // Description annotation not required on setter, since getter is annotated
- *  public void setNumber(int number) {
- *      this.number = number;
- *  }
- *  </pre>
+ * Sample class for implementing commonly monitored metrics in a message processing system.
+ * This class may be extended, and new metrics (attributes and operations) may be added by applying annotations to the subclass
  *
  * @author morten.hattesen@gmail.com
  */
 @MBean(value="Generic MBean for monitoring input/output processing",
-        objectName="org.softee:name=Default,type=org.softee.ProcessingMBean")
-public class ProcessingPojoMBean extends AbstractPojoMBean {
+        objectName="org.softee:name=Default,type=org.softee.MessagingMBean")
+public class MessagingMBean extends AbstractMBean {
 
     private AtomicLong inputCount;
     private AtomicLong inputLatest;
@@ -61,7 +42,7 @@ public class ProcessingPojoMBean extends AbstractPojoMBean {
     private AtomicLong failedLatest;
     private Throwable failedLatestCause;
 
-    public ProcessingPojoMBean(String name) throws MalformedObjectNameException {
+    public MessagingMBean(String name) throws MalformedObjectNameException {
         super(name);
     }
 

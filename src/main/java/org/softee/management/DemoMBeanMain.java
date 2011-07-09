@@ -4,18 +4,18 @@ import java.util.concurrent.TimeUnit;
 
 import org.softee.time.StopWatch;
 
-public class DemoPojoMBeanMain implements Runnable {
+public class DemoMBeanMain implements Runnable {
     private static final int DEMO_PROCESSING_TIME_MILLIS = 1000;
-    private ProcessingPojoMBean monitor;
+    private MessagingMBean monitor;
 
-    private DemoPojoMBeanMain() {
+    private DemoMBeanMain() {
 
     }
 
     @Override
     public void run() {
         try {
-            monitor = new ProcessingPojoMBean("Demonstration");
+            monitor = new MessagingMBean("Demonstration");
             start();
             runFor(1, TimeUnit.DAYS, DEMO_PROCESSING_TIME_MILLIS);
             shutdown();
@@ -32,7 +32,7 @@ public class DemoPojoMBeanMain implements Runnable {
     }
 
     public static void main(String[] args) {
-        new DemoPojoMBeanMain().run();
+        new DemoMBeanMain().run();
     }
 
     public void runFor(int value, TimeUnit tu, int averageProcessingTimeMillis) {
