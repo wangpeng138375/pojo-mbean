@@ -4,9 +4,11 @@ import org.softee.management.annotation.MBean;
 import org.softee.management.annotation.Operation;
 import org.softee.management.annotation.Parameter;
 import org.softee.management.annotation.Property;
+import org.softee.management.annotation.Property.Access;
 
 @MBean("DummyAnnotatedMbean")
 public class DummyAnnotatedMbean {
+    @Property(value = "integer", access=Access.WRITE)
     int integer;
     String string = "A string";
     String operationArgument;
@@ -35,7 +37,6 @@ public class DummyAnnotatedMbean {
         operationArgument = argument;
     }
 
-    @Property("integer")
     public void setInteger(int integer) {
         this.integer = integer;
     }

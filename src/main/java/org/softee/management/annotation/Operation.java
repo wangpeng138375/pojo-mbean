@@ -18,7 +18,7 @@ public @interface Operation {
      */
     public enum Impact {INFO(0), ACTION(1), ACTION_INFO(2), UNKNOWN(3);
         public final int impactValue;
-        Impact(int impactValue) {
+        private Impact(int impactValue) {
             this.impactValue = impactValue;
         }
     }

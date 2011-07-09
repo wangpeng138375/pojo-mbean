@@ -1,11 +1,14 @@
 package org.softee.management.helper;
 
+import static java.lang.String.format;
+
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.MethodDescriptor;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -34,6 +37,7 @@ import org.softee.management.annotation.Operation;
 import org.softee.management.annotation.Operation.Impact;
 import org.softee.management.annotation.Parameter;
 import org.softee.management.annotation.Property;
+import org.softee.management.annotation.Property.Access;
 import org.softee.management.exception.ManagementException;
 /**
  * A DynamicMBean that can introspect an annotated POJO bean and expose it as a DynamicMBean
@@ -43,7 +47,7 @@ import org.softee.management.exception.ManagementException;
  */
 public class IntrospectedDynamicMBean implements DynamicMBean {
     private final Object mbean;
-    private final Class<?> mbeanType;
+    private final Class<?> beanClass;
     private final Map<String, PropertyDescriptor> propertyDescriptors;
     private final Map<String, Method> operationMethods;
     private final MBeanInfo mbeanInfo;
@@ -54,13 +58,13 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
      */
     public IntrospectedDynamicMBean(Object mbean) throws ManagementException {
         this.mbean = mbean;
-        this.mbeanType = mbean.getClass();
-        if (!mbeanType.isAnnotationPresent(MBean.class)) {
+        this.beanClass = mbean.getClass();
+        if (!beanClass.isAnnotationPresent(MBean.class)) {
             throw new IllegalArgumentException(
-                    String.format("mbean type %s is not annotated with %s", mbean.getClass(), MBean.class));
+                    format("MBean %s is not annotated with @%s", beanClass, MBean.class.getName()));
         }
         try {
-            BeanInfo beanInfo = Introspector.getBeanInfo(mbeanType);
+            BeanInfo beanInfo = Introspector.getBeanInfo(beanClass);
             propertyDescriptors = createPropertyDescriptors(beanInfo);
             operationMethods = createOperationMethods(beanInfo);
             mbeanInfo = createMbeanInfo();
@@ -81,13 +85,14 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
         }
         Method getter = propertyDescriptor.getReadMethod();
         if (getter == null) {
-            throw new AttributeNotFoundException("getter method for attribute " + attribute);
+            throw new AttributeNotFoundException(
+                    format("Getter method for attribute %s of %s", attribute, beanClass));
         }
         try {
             return getter.invoke(mbean);
         } catch (Exception e) {
             throw new RuntimeException(
-                    String.format("Unable to obtain value of attribute %s in bean %s", attribute, mbean));
+                    format("Unable to obtain value of attribute %s of %s", attribute, beanClass));
         }
     }
 
@@ -117,7 +122,7 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
         }
         Method setter = propertyDescriptor.getWriteMethod();
         if (setter == null) {
-            throw new AttributeNotFoundException("setter method for attribute " + name);
+            throw new AttributeNotFoundException(format("setter method for attribute %s of %s", name, beanClass));
         }
         try {
             setter.invoke(mbean, value);
@@ -125,9 +130,11 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
             throw new InvalidAttributeValueException(String.format("attribute %s, value = (%s)%s, expected (%s)",
                     name, value.getClass().getName(), value, setter.getParameterTypes()[0].getName()));
         } catch (IllegalAccessException e) {
-            throw new ReflectionException(e, String.format("attribute %s, value = (%s)%s", name, value.getClass().getName(), value));
+            throw new ReflectionException(e, format("attribute %s of %s, value = (%s)%s",
+                    name, beanClass, value.getClass().getName(), value));
         } catch (InvocationTargetException e) {
-            throw new MBeanException(e, String.format("attribute %s, value = (%s)%s", name, value.getClass().getName(), value));
+            throw new MBeanException(e, format("attribute %s of %s, value = (%s)%s",
+                    name, beanClass, value.getClass().getName(), value));
         }
     }
 
@@ -206,12 +213,13 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
         Map<String, Method> operationMethods = new HashMap<String, Method>();
         for (MethodDescriptor descriptor : beanInfo.getMethodDescriptors()) {
             Method method = descriptor.getMethod();
-            Operation annotation = getAnnotation(Operation.class, method);
+            Operation annotation = method.getAnnotation(Operation.class);
             if (annotation != null) {
                 // This method is an operation
                 Method old = operationMethods.put(method.getName(), method);
                 if (old != null) {
-                    throw new ManagementException("Multiple Operation annotations for operation " + method.getName());
+                    throw new ManagementException(format("Multiple Operation annotations for operation %s of %s",
+                            method.getName(), beanClass));
                 }
             }
         }
@@ -220,14 +228,15 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
 
     /**
      * @return an MBeanOPerationInfo array that describes the @Operation annotated methods of the operationMethods
+     * @throws ManagementException
      */
-    private MBeanOperationInfo[] createOperationInfo() {
+    private MBeanOperationInfo[] createOperationInfo() throws ManagementException {
         MBeanOperationInfo[] operationInfos = new MBeanOperationInfo[operationMethods.size()];
         int operationIndex = 0;
         // Iterate in method name order
         for (String methodName : sortedKeys(operationMethods)) {
             Method method = operationMethods.get(methodName);
-            Operation annotation = getAnnotation(Operation.class, method);
+            Operation annotation = method.getAnnotation(Operation.class);
             // add description and names to parameters
             MBeanParameterInfo[] signature = createParameterInfo(method);
             // add description and parameter info to operation method
@@ -294,15 +303,21 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
     }
 
     /**
-     * @return all properties where getter or setter is annotated with {@link org.softee.management.annotation.Property}
+     * @return all properties where field, getter or setter is annotated with {@link org.softee.management.annotation.Property}
+     * @throws ManagementException
      */
-    private Map<String, PropertyDescriptor> createPropertyDescriptors(BeanInfo beanInfo) {
+    private Map<String, PropertyDescriptor> createPropertyDescriptors(BeanInfo beanInfo) throws ManagementException {
         Map<String, PropertyDescriptor> properties = new HashMap<String, PropertyDescriptor>();
         for (PropertyDescriptor property: beanInfo.getPropertyDescriptors()) {
-            Property annotation = getAnnotation(Property.class,
-                        property.getReadMethod(), property.getWriteMethod());
+            String name = property.getName();
+            Field field = getField(beanClass, name);
+            Property annotation = getSingleAnnotation(property, Property.class,
+                        field, property.getReadMethod(), property.getWriteMethod());
+            /* this time around, we'll use the presence of a Property annotation on either field, setter or getter method as a
+             * signal to add the property to the Property annotated properties for future quick lookup
+             */
             if (annotation != null) {
-                properties.put(property.getName(), property);
+                properties.put(name, property);
             }
         }
         return properties;
@@ -311,32 +326,68 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
     private MBeanAttributeInfo[] createAttributeInfo() throws ManagementException, IntrospectionException {
         MBeanAttributeInfo[] infos = new MBeanAttributeInfo[propertyDescriptors.size()];
         int i = 0;
-        // we should iterate over properties sorted by name
+        // iterate over properties sorted by name
         for (String propertyName : sortedKeys(propertyDescriptors)) {
             PropertyDescriptor property = propertyDescriptors.get(propertyName);
+            String name = property.getName();
+            Field field = getField(beanClass, name);
             Method readMethod = property.getReadMethod();
-            if (readMethod != null && readMethod.getParameterTypes().length != 0) {
-                throw new ManagementException(
-                        String.format("Getter method %s of class %s has > 0 parameters (does not follow beanspec)",
-                                readMethod.getName(), readMethod.getDeclaringClass()));
-            }
             Method writeMethod = property.getWriteMethod();
-            if (writeMethod != null && writeMethod.getParameterTypes().length != 1) {
+            Property annotation = getSingleAnnotation(property, Property.class, field, readMethod, writeMethod);
+            Access access = annotation.access();
+            if (access.canRead && readMethod == null) {
+                boolean isBoolean = field != null && Boolean.TYPE == field.getType();
+                String isErText = isBoolean ? " or is" + initialCapital(name) + "()" : "";
                 throw new ManagementException(
-                        String.format("Setter method %s of class %s has != 1 parameters (does not follow beanspec)",
-                                writeMethod.getName(), writeMethod.getDeclaringClass()));
+                        format("%s access specified for property %s of %s, but no get%s()%s method found",
+                                access, name, beanClass, initialCapital(name), isErText));
             }
-            Property attribute = getAnnotation(Property.class, readMethod, writeMethod);
+            if (access.canWrite && writeMethod == null) {
+                throw new ManagementException(
+                        format("%s access specified for property %s of %s, but no set%s() method found",
+                                access, name, beanClass, initialCapital(name)));
+            }
+            // now restrict the methods exposed to the MBean to those allowed by the annotation
+            Method declaredReadMethod = access.canRead ? readMethod : null;
+            Method declaredWriteMethod = access.canWrite ? writeMethod : null;
             MBeanAttributeInfo info = new MBeanAttributeInfo(
                     property.getName(),
-                    attribute.value(),
-                    readMethod,
-                    writeMethod);
+                    annotation.value(),
+                    declaredReadMethod,
+                    declaredWriteMethod);
             infos[i++] = info;
         }
         return infos;
     }
 
+    /**
+     * Locates a field on a class. The Class.getField(name) method does not return non-private fields,
+     * so the only way to locate fields is to look for fields up the inheritance hierarchy
+     * @param beanClass The class on which to locate the bean
+     * @param name the name of the bean
+     * @return field of beanClass named name, or null if such a field does not exist
+     * @throws ManagementException
+     */
+    public Field getField(Class<?> beanClass, String name)
+            throws ManagementException {
+        Class<?> clazz = beanClass;
+        while (clazz != null) {
+            try {
+                return clazz.getDeclaredField(name);
+            } catch (SecurityException e) {
+                throw new ManagementException(format("Unable to access field %s of %s", name, clazz));
+            } catch (NoSuchFieldException ignore) {
+                // ignore
+            }
+            clazz = clazz.getSuperclass();
+        }
+        return null;
+    }
+
+    /**
+     * @param map
+     * @return a list of the keys in map, sorted
+     */
     private List<String> sortedKeys(Map<String, ?> map) {
         List<String> keys = new ArrayList<String>(map.keySet());
         Collections.sort(keys);
@@ -346,21 +397,34 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
     /**
      *
      * @param <T>
+     * @param property The property to which entities belong
      * @param annotationClass Annotation type
      * @param entities A number of {@code Method}'s or {@code null}'s
-     * @return The first annotation of type {@code annotationClass} that appears on {@code methods}, or null
+     * @return The one (and only) annotation of type {@code annotationClass} that appears on {@code methods},
+     * or null if none of the entities are annotated with annotationClass
+     * @throws ManagementException if more than one of the entities are annotated with annotationClass
      */
-    private <T extends Annotation> T getAnnotation(Class<T> annotationClass, AccessibleObject... entities) {
+    private <T extends Annotation> T getSingleAnnotation(PropertyDescriptor property, Class<T> annotationClass,
+            AccessibleObject... entities) throws ManagementException {
+        T result = null;
         for (AccessibleObject entity : entities) {
             if (entity != null) {
                 T annotation = entity.getAnnotation(annotationClass);
                 if (annotation != null) {
-                    return annotation;
+                    if (result != null) {
+                        throw new ManagementException(
+                                String.format("Multiple %s annotations found for property %s of %s",
+                                        annotationClass.getName(), property.getName(), beanClass));
+                    }
+                    result = annotation;
                 }
             }
         }
-        return null;
+        return result;
     }
 
+    private String initialCapital(String s) {
+        return s.substring(0, 1).toUpperCase() + s.substring(1);
+    }
 
 }
