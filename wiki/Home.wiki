@@ -17,6 +17,6 @@ More details will follow, including:
 
 The JMX 2.0 API specification should provide something similar to pojo-mbean at some point in the future.
 
-And while the JMX 2.0 was originally scheduled for Java SE 6, it clearly didn't make that milestone. Java SE 7 seems like the same story again, and with little or no activity for years, I wouldn't even hold my breath for Java SE 8. The most recent update on the [http://jcp.org/en/jsr/detail?id=255#updates JSR-255  updates section] is _2006.01.20: This JSR is now scheduled for Dolphin (Java SE 7) and not Mustang_
+But while the JMX 2.0 was originally scheduled for Java SE 6, it clearly didn't make that milestone. Java SE 7 seems like the same story again, and with little or no activity for years, I wouldn't even hold my breath for Java SE 8. The most recent update on the [http://jcp.org/en/jsr/detail?id=255#updates JSR-255  updates section] is _2006.01.20: This JSR is now scheduled for Dolphin (Java SE 7) and not Mustang_ and the JSR 255 status is "inactive".
 
 To learn about the JMX 2.0 API ([http://jcp.org/en/jsr/detail?id=255 JSR 255]) look at the JMX Spec Lead [http://weblogs.java.net/blog/emcmanus/archive/2007/08/defining_mbeans.html Eamonn McManus' post on java.net].
