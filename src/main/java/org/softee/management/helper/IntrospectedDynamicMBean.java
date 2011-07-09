@@ -33,11 +33,11 @@ import javax.management.MBeanParameterInfo;
 import javax.management.ReflectionException;
 
 import org.softee.management.annotation.MBean;
-import org.softee.management.annotation.Operation;
-import org.softee.management.annotation.Operation.Impact;
+import org.softee.management.annotation.ManagedOperation;
+import org.softee.management.annotation.ManagedOperation.Impact;
 import org.softee.management.annotation.Parameter;
-import org.softee.management.annotation.Property;
-import org.softee.management.annotation.Property.Access;
+import org.softee.management.annotation.ManagedAttribute;
+import org.softee.management.annotation.ManagedAttribute.Access;
 import org.softee.management.exception.ManagementException;
 /**
  * A DynamicMBean that can introspect an annotated POJO bean and expose it as a DynamicMBean
@@ -213,7 +213,7 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
         Map<String, Method> operationMethods = new HashMap<String, Method>();
         for (MethodDescriptor descriptor : beanInfo.getMethodDescriptors()) {
             Method method = descriptor.getMethod();
-            Operation annotation = method.getAnnotation(Operation.class);
+            ManagedOperation annotation = method.getAnnotation(ManagedOperation.class);
             if (annotation != null) {
                 // This method is an operation
                 Method old = operationMethods.put(method.getName(), method);
@@ -236,7 +236,7 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
         // Iterate in method name order
         for (String methodName : sortedKeys(operationMethods)) {
             Method method = operationMethods.get(methodName);
-            Operation annotation = method.getAnnotation(Operation.class);
+            ManagedOperation annotation = method.getAnnotation(ManagedOperation.class);
             // add description and names to parameters
             MBeanParameterInfo[] signature = createParameterInfo(method);
             // add description and parameter info to operation method
@@ -303,7 +303,7 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
     }
 
     /**
-     * @return all properties where field, getter or setter is annotated with {@link org.softee.management.annotation.Property}
+     * @return all properties where field, getter or setter is annotated with {@link org.softee.management.annotation.ManagedAttribute}
      * @throws ManagementException
      */
     private Map<String, PropertyDescriptor> createPropertyDescriptors(BeanInfo beanInfo) throws ManagementException {
@@ -311,7 +311,7 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
         for (PropertyDescriptor property: beanInfo.getPropertyDescriptors()) {
             String name = property.getName();
             Field field = getField(beanClass, name);
-            Property annotation = getSingleAnnotation(property, Property.class,
+            ManagedAttribute annotation = getSingleAnnotation(property, ManagedAttribute.class,
                         field, property.getReadMethod(), property.getWriteMethod());
             /* this time around, we'll use the presence of a Property annotation on either field, setter or getter method as a
              * signal to add the property to the Property annotated properties for future quick lookup
@@ -333,7 +333,7 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
             Field field = getField(beanClass, name);
             Method readMethod = property.getReadMethod();
             Method writeMethod = property.getWriteMethod();
-            Property annotation = getSingleAnnotation(property, Property.class, field, readMethod, writeMethod);
+            ManagedAttribute annotation = getSingleAnnotation(property, ManagedAttribute.class, field, readMethod, writeMethod);
             Access access = annotation.access();
             if (access.canRead && readMethod == null) {
                 boolean isBoolean = field != null && Boolean.TYPE == field.getType();

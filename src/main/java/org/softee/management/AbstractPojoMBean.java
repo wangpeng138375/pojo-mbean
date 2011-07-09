@@ -12,8 +12,8 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.softee.management.annotation.Operation;
-import org.softee.management.annotation.Property;
+import org.softee.management.annotation.ManagedOperation;
+import org.softee.management.annotation.ManagedAttribute;
 import org.softee.management.exception.ManagementException;
 import org.softee.util.Preconditions;
 
@@ -74,7 +74,7 @@ public abstract class AbstractPojoMBean {
         reset();
     }
 
-    @Operation(value = "Reset the MBean", impact = Operation.Impact.ACTION)
+    @ManagedOperation(value = "Reset the MBean", impact = ManagedOperation.Impact.ACTION)
     public void reset() {
         // Nothing to reset - shouldn't reset the start time
     }
@@ -97,7 +97,7 @@ public abstract class AbstractPojoMBean {
     }
 
 
-    @Property("The time when the monitor was started")
+    @ManagedAttribute("The time when the monitor was started")
     public String getStarted() {
         return dateString(noneAsNull(started));
     }

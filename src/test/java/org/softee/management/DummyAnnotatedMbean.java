@@ -1,22 +1,22 @@
 package org.softee.management;
 
 import org.softee.management.annotation.MBean;
-import org.softee.management.annotation.Operation;
+import org.softee.management.annotation.ManagedOperation;
 import org.softee.management.annotation.Parameter;
-import org.softee.management.annotation.Property;
-import org.softee.management.annotation.Property.Access;
+import org.softee.management.annotation.ManagedAttribute;
+import org.softee.management.annotation.ManagedAttribute.Access;
 
 @MBean("DummyAnnotatedMbean")
 public class DummyAnnotatedMbean {
-    @Property(value = "integer", access=Access.WRITE)
+    @ManagedAttribute(value = "integer", access=Access.WRITE)
     int integer;
     String string = "A string";
     String operationArgument;
 
-    @Property(access = Property.Access.READ_WRITE)
+    @ManagedAttribute(access = ManagedAttribute.Access.READ_WRITE)
     String ipsum;
 
-    @Property("string that can only be read")
+    @ManagedAttribute("string that can only be read")
     public String getString() {
         return string;
     }
@@ -26,13 +26,13 @@ public class DummyAnnotatedMbean {
         string = value;
     }
 
-    @Property(value="A Lorem", access=Property.Access.READ)
+    @ManagedAttribute(value="A Lorem", access=ManagedAttribute.Access.READ)
     public String getLorem() {
         return "Here is a Lorem";
     }
 
 
-    @Operation("voidOneArgOperation")
+    @ManagedOperation("voidOneArgOperation")
     public void voidOneArgOperation(@Parameter(value = "An argument", name = "argument") String argument) {
         operationArgument = argument;
     }

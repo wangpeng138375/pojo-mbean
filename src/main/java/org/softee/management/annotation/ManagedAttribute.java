@@ -20,7 +20,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Inherited
-public @interface Property {
+public @interface ManagedAttribute {
     public enum Access {READ(true, false), WRITE(false, true), READ_WRITE(true, true);
         public final boolean canRead;
         public final boolean canWrite;

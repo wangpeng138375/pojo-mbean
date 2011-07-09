@@ -13,8 +13,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.management.MalformedObjectNameException;
 
 import org.softee.management.annotation.MBean;
-import org.softee.management.annotation.Operation;
-import org.softee.management.annotation.Property;
+import org.softee.management.annotation.ManagedOperation;
+import org.softee.management.annotation.ManagedAttribute;
 import org.softee.management.exception.ManagementException;
 
 /**
@@ -143,7 +143,7 @@ public class ProcessingPojoMBean extends AbstractPojoMBean {
     }
 
     @Override
-    @Operation(value = "Reset the accumulated statistics", impact = Operation.Impact.ACTION)
+    @ManagedOperation(value = "Reset the accumulated statistics", impact = ManagedOperation.Impact.ACTION)
     public synchronized void reset() {
         super.reset();
         inputLatest = none();
@@ -159,79 +159,79 @@ public class ProcessingPojoMBean extends AbstractPojoMBean {
     }
 
 
-    @Property("Number of messages received")
+    @ManagedAttribute("Number of messages received")
     public long getInputCount() {
         return inputCount.get();
     }
 
-    @Property("Time of last received message")
+    @ManagedAttribute("Time of last received message")
     public String getInputLatest() {
         return dateString(noneAsNull(inputLatest));
     }
 
-    @Property("Time since latest received message (seconds)")
+    @ManagedAttribute("Time since latest received message (seconds)")
     public Long getInputLatestAgeSeconds() {
         return age(noneAsNull(inputLatest), SECONDS);
     }
 
-    @Property("Number of processed messages")
+    @ManagedAttribute("Number of processed messages")
     public long getOutputCount() {
         return outputCount.get();
     }
 
-    @Property("Time of the latest processed message")
+    @ManagedAttribute("Time of the latest processed message")
     public String getOutputLatest() {
         return dateString(noneAsNull(outputLatest));
    }
 
-    @Property("Time since latest processed message (seconds)")
+    @ManagedAttribute("Time since latest processed message (seconds)")
     public Long getOutputLatestAgeSeconds() {
         return age(noneAsNull(outputLatest), SECONDS);
     }
 
-    @Property("Processing time of the latest message (ms)")
+    @ManagedAttribute("Processing time of the latest message (ms)")
     public Long getDurationLatestMillis() {
         return noneAsNull(durationLastMillis);
     }
 
-    @Property("Total processing time of all messages (ms)")
+    @ManagedAttribute("Total processing time of all messages (ms)")
     public long getDurationTotalMillis() {
         return durationTotalMillis.get();
     }
 
-    @Property("Average processing time (ms)")
+    @ManagedAttribute("Average processing time (ms)")
     public Long getDurationAverageMillis() {
         long processedDurationTotalMillis = getDurationTotalMillis();
         long processedCount = getOutputCount();
         return (processedCount != 0) ? processedDurationTotalMillis/processedCount : null;
     }
 
-    @Property("Min processing time (ms)")
+    @ManagedAttribute("Min processing time (ms)")
     public Long getDurationMinMillis() {
         return noneAsNull(durationMinMillis);
     }
 
-    @Property("Max processing time (ms)")
+    @ManagedAttribute("Max processing time (ms)")
     public Long getDurationMaxMillis() {
         return noneAsNull(durationMaxMillis);
     }
 
-    @Property("Number of processes that failed")
+    @ManagedAttribute("Number of processes that failed")
     public long getFailedCount() {
         return failedCount.get();
     }
 
-    @Property("Time of the latest failed message processing")
+    @ManagedAttribute("Time of the latest failed message processing")
     public String getFailedLatest() {
         return dateString(noneAsNull(failedLatest));
     }
 
-    @Property("Time since latest failed message processing (seconds)")
+    @ManagedAttribute("Time since latest failed message processing (seconds)")
     public Long getFailedLatestAgeSeconds() {
         return age(noneAsNull(failedLatest), SECONDS);
     }
 
-    @Property("The failure reason of the latest failed message processing")
+    @ManagedAttribute("The failure reason of the latest failed message processing")
     public String getFailedLatestReason() {
         if (failedLatestCause == null) {
             return null;
@@ -244,7 +244,7 @@ public class ProcessingPojoMBean extends AbstractPojoMBean {
      * the elements will be presented one-per-line.<p>
      * If required, look into presenting in a composite or tabular form (see {@link javax.management.MXBean}
      */
-    @Property("The failure stacktrace of the latest failed message processing (one line per element)")
+    @ManagedAttribute("The failure stacktrace of the latest failed message processing (one line per element)")
     public String[] getFailedLatestStacktrace() {
         if (failedLatestCause == null) {
             return null;
