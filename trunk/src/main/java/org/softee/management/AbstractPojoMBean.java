@@ -1,5 +1,6 @@
 package org.softee.management;
 
+import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.lang.management.ManagementFactory;
@@ -19,6 +20,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.softee.management.annotation.MBean;
 import org.softee.management.annotation.Operation;
 import org.softee.management.annotation.Property;
 import org.softee.management.exception.ManagementException;
@@ -26,17 +28,40 @@ import org.softee.management.helper.IntrospectedDynamicMBean;
 
 /**
  * An abstract base-class for generating Pojo MBeans that are capable of registering and unregistering themselves
- * 
+ *
  * @author morten.hattesen@gmail.com
  *
  */
 public abstract class AbstractPojoMBean {
     protected static final long NONE = Long.MIN_VALUE;
-    private final String name;
-    private final DatatypeFactory dtf;
-    protected final MBeanServer mBeanServer;
-    protected final ObjectName mBeanObjectName;
+    private DatatypeFactory dtf;
+    protected MBeanServer mBeanServer;
+    protected ObjectName mBeanObjectName;
+    private String name;
     private AtomicLong started;
+
+
+    /**
+     * Construct an MBean based on the @MBean annotation properties
+     * @param name
+     * @throws ManagementException
+     * @throws MalformedObjectNameException
+     */
+    public AbstractPojoMBean(String name) throws MalformedObjectNameException {
+        MBean annotation = getClass().getAnnotation(MBean.class);
+        if (annotation == null) {
+            throw new MalformedObjectNameException(format("%s is not annotated with @%s", getClass(), MBean.class.getName()));
+        }
+        String domain = annotation.domain();
+        if (domain.isEmpty()) {
+            throw new MalformedObjectNameException(format("@%s does not define the 'domain' attribute", MBean.class.getName()));
+        }
+        String type = annotation.type();
+        if (domain.isEmpty()) {
+            throw new MalformedObjectNameException(format("@%s does not define the 'domain' attribute", MBean.class.getName()));
+        }
+        initialize(domain, type, name);
+    }
 
     /**
      * @param type the type (class) of the MBean. The parent package is used as the domain of the MBean
@@ -44,11 +69,11 @@ public abstract class AbstractPojoMBean {
      * @throws MalformedObjectNameException
      */
     public AbstractPojoMBean(Class<?> type, String name) throws MalformedObjectNameException {
-        this(type.getPackage(), type, name);
+        initialize(type.getPackage().getName(), type.getName(), name);
     }
-    
+
     /**
-     * 
+     *
      * @param domain the domain of the MBean
      * @param type the type (class) of the MBean.
      * @param name the name of the MBean
@@ -64,21 +89,26 @@ public abstract class AbstractPojoMBean {
         if (name == null) {
             throw new NullPointerException("name");
         }
+        initialize(domain.getName(), type.getName(), name);
+    }
+
+    protected void initialize(String domain, String type, String name)
+            throws MalformedObjectNameException {
         this.name = name;
-        mBeanObjectName = createObjectName(domain.getName(), type, name);
+        mBeanObjectName = createObjectName(domain, type, name);
         mBeanServer = ManagementFactory.getPlatformMBeanServer();
-        
+
         // XmlGregorianCalendar suport init
         try {
             dtf = DatatypeFactory.newInstance();
         } catch (DatatypeConfigurationException e) {
             throw new RuntimeException(e);
         }
-        
+
         // Reset all stats
         reset();
     }
-    
+
     @Operation(value = "Reset the MBean", impact = Operation.Impact.ACTION)
     public void reset() {
         // Nothing to reset - shouldn't reset the start time
@@ -88,10 +118,11 @@ public abstract class AbstractPojoMBean {
     public String getStarted() {
         return dateString(noneAsNull(started));
     }
-    
+
     public String getName() {
         return name;
     }
+
     /**
      * Constructs an objectName of the format:
      * {@code <domain>:name=<name>,type=<type>}
@@ -101,13 +132,13 @@ public abstract class AbstractPojoMBean {
      * @return an objectName constructed as above
      * @throws MalformedObjectNameException
      */
-    protected ObjectName createObjectName(String domain, Class<?> type, String name) throws MalformedObjectNameException {
-        return new ObjectName(domain + ":name=" + name + ",type=" + type.getName());
+    protected ObjectName createObjectName(String domain, String type, String name) throws MalformedObjectNameException {
+        return new ObjectName(domain + ":name=" + name + ",type=" + type);
     }
 
     /**
      * Start monitoring and register the MBean with the MBean server
-     * @throws ManagementException 
+     * @throws ManagementException
      */
     public void start() throws ManagementException {
         started = new AtomicLong(now());
@@ -116,7 +147,7 @@ public abstract class AbstractPojoMBean {
 
     /**
      * Stop monitoring and unregister the MBean with the MBean server
-     * @throws ManagementException 
+     * @throws ManagementException
      */
     public void stop() throws ManagementException {
         unregister();
@@ -125,11 +156,11 @@ public abstract class AbstractPojoMBean {
     /**
      * Register the MXBean.
      * If the registration fails, a WARN message is logged
-     * @throws java.beans.IntrospectionException 
-     * @throws IntrospectionException 
-     * @throws NotCompliantMBeanException 
-     * @throws MBeanRegistrationException 
-     * @throws InstanceAlreadyExistsException 
+     * @throws java.beans.IntrospectionException
+     * @throws IntrospectionException
+     * @throws NotCompliantMBeanException
+     * @throws MBeanRegistrationException
+     * @throws InstanceAlreadyExistsException
      */
     protected void register() throws ManagementException {
         try {
@@ -142,8 +173,8 @@ public abstract class AbstractPojoMBean {
     /**
      * Unregister the MXBean.
      * If the unregistration fails, a WARN message is logged
-     * @throws InstanceNotFoundException 
-     * @throws MBeanRegistrationException 
+     * @throws InstanceNotFoundException
+     * @throws MBeanRegistrationException
      */
     protected void unregister() throws ManagementException {
         try {
@@ -163,7 +194,7 @@ public abstract class AbstractPojoMBean {
     }
 
     /**
-     * 
+     *
      * @param millis
      * @return millis formatted as an ISO 8601 (XML datetime) string
      */
