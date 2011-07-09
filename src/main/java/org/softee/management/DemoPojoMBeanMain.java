@@ -8,14 +8,14 @@ public class DemoPojoMBeanMain implements Runnable {
     private static final int DEMO_PROCESSING_TIME_MILLIS = 1000;
     private ProcessingPojoMBean monitor;
 
-    public DemoPojoMBeanMain() {
+    private DemoPojoMBeanMain() {
 
     }
 
     @Override
     public void run() {
         try {
-            monitor = new ProcessingPojoMBean(getClass(), "Demonstration");
+            monitor = new ProcessingPojoMBean("Demonstration");
             start();
             runFor(1, TimeUnit.DAYS, DEMO_PROCESSING_TIME_MILLIS);
             shutdown();

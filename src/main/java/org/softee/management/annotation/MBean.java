@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 
+ *
  * @author morten.hattesen@gmail.com
  *
  */
@@ -16,5 +16,20 @@ public @interface MBean {
     /**
      * @return the textual description of the MBean to be displayed by the management agent
      */
-    String value();
+    String value() default "";
+
+    /**
+     * @return the domain part of the ObjectName for MBean server registration
+     */
+    String domain() default "";
+
+    /**
+     * @return the type part of the ObjectName for MBean server registration
+     */
+    String type() default "";
+
+    /**
+     * @return the type part of the ObjectName for MBean server registration
+     */
+    String name() default "";
 }

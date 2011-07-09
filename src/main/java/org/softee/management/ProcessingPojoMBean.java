@@ -42,7 +42,10 @@ import org.softee.management.exception.ManagementException;
  *
  * @author morten.hattesen@gmail.com
  */
-@MBean("Generic MBean for monitoring input/output processing")
+@MBean(value="Generic MBean for monitoring input/output processing",
+    domain="org.softee",
+    type="org.softee.ProcessingMBean",
+    name="Default")
 public class ProcessingPojoMBean extends AbstractPojoMBean {
 
     private AtomicLong inputCount;
@@ -60,6 +63,9 @@ public class ProcessingPojoMBean extends AbstractPojoMBean {
     private AtomicLong failedLatest;
     private Throwable failedLatestCause;
 
+    public ProcessingPojoMBean(String name) throws MalformedObjectNameException {
+        super(name);
+    }
     public ProcessingPojoMBean(Class<?> type, String name) throws MalformedObjectNameException {
         super(type, name);
     }
