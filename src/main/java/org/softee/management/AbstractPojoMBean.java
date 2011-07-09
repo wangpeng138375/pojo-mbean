@@ -42,12 +42,11 @@ public abstract class AbstractPojoMBean {
 
 
     /**
-     * Construct an MBean based on the @MBean annotation properties
-     * @param name
-     * @throws ManagementException
-     * @throws MalformedObjectNameException
+     * Construct an MBean using the domain and type attribute of the @MBean
+     * @param name the name of the MBean, or null to fetch name from the name attribute of the @MBean annotation
+     * @throws MalformedObjectNameException if either domain, type or name is not specified
      */
-    public AbstractPojoMBean(String name) throws MalformedObjectNameException {
+    public AbstractPojoMBean(String overrideName) throws MalformedObjectNameException {
         MBean annotation = getClass().getAnnotation(MBean.class);
         if (annotation == null) {
             throw new MalformedObjectNameException(format("%s is not annotated with @%s", getClass(), MBean.class.getName()));
@@ -58,9 +57,13 @@ public abstract class AbstractPojoMBean {
         }
         String type = annotation.type();
         if (domain.isEmpty()) {
+            throw new MalformedObjectNameException(format("@%s does not define the 'type' attribute", MBean.class.getName()));
+        }
+        String name = annotation.name();
+        if (name.isEmpty() && overrideName == null) {
             throw new MalformedObjectNameException(format("@%s does not define the 'domain' attribute", MBean.class.getName()));
         }
-        initialize(domain, type, name);
+        initialize(domain, type, firstNotNull(overrideName, name));
     }
 
     /**
@@ -98,7 +101,6 @@ public abstract class AbstractPojoMBean {
         mBeanObjectName = createObjectName(domain, type, name);
         mBeanServer = ManagementFactory.getPlatformMBeanServer();
 
-        // XmlGregorianCalendar suport init
         try {
             dtf = DatatypeFactory.newInstance();
         } catch (DatatypeConfigurationException e) {
@@ -112,15 +114,6 @@ public abstract class AbstractPojoMBean {
     @Operation(value = "Reset the MBean", impact = Operation.Impact.ACTION)
     public void reset() {
         // Nothing to reset - shouldn't reset the start time
-    }
-
-    @Property("The time when the monitor was started")
-    public String getStarted() {
-        return dateString(noneAsNull(started));
-    }
-
-    public String getName() {
-        return name;
     }
 
     /**
@@ -184,6 +177,15 @@ public abstract class AbstractPojoMBean {
         }
     }
 
+    @Property("The time when the monitor was started")
+    public String getStarted() {
+        return dateString(noneAsNull(started));
+    }
+
+    public String getName() {
+        return name;
+    }
+
     protected Long noneAsNull(AtomicLong a) {
         long n = a.get();
         return n == NONE ? null : n;
@@ -232,4 +234,12 @@ public abstract class AbstractPojoMBean {
         return new AtomicLong(NONE);
     }
 
+    private <T> T firstNotNull(T... all) {
+        for (T element : all) {
+            if (element != null) {
+                return element;
+            }
+        }
+        throw new IllegalArgumentException("All null arguments");
+    }
 }
