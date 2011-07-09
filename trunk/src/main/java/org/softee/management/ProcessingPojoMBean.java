@@ -88,7 +88,7 @@ public class ProcessingPojoMBean extends AbstractPojoMBean {
              * 1. notifyStop() without preceding notifyStart()
              * 2. a call to reset() since last notifyStart()
              */
-            notifyOutput(0);
+            notifyOutput(-1);
         } else {
             notifyOutput(now() - latest);
         }
@@ -99,21 +99,22 @@ public class ProcessingPojoMBean extends AbstractPojoMBean {
      * @param durationMillis The duration of the processing in milliseconds
      */
     public synchronized void notifyOutput(long durationMillis) {
-        durationMillis = Math.max(0, durationMillis);
-
         outputLatest.set(now());
         outputCount.incrementAndGet();
-        durationLastMillis.set(durationMillis);
-        durationTotalMillis.addAndGet(durationMillis);
 
-        Long minMillis = getDurationMinMillis();
-        if ((minMillis == null) || (minMillis != null && durationMillis < minMillis)) {
-            durationMinMillis.set(durationMillis);
-        }
+        if (durationMillis >= 0) {
+            durationLastMillis.set(durationMillis);
+            durationTotalMillis.addAndGet(durationMillis);
 
-        Long maxMillis = getDurationMaxMillis();
-        if ((maxMillis == null) || (durationMillis > maxMillis)) {
-            durationMaxMillis.set(durationMillis);
+            Long minMillis = getDurationMinMillis();
+            if ((minMillis == null) || (minMillis != null && durationMillis < minMillis)) {
+                durationMinMillis.set(durationMillis);
+            }
+
+            Long maxMillis = getDurationMaxMillis();
+            if ((maxMillis == null) || (durationMillis > maxMillis)) {
+                durationMaxMillis.set(durationMillis);
+            }
         }
     }
 
