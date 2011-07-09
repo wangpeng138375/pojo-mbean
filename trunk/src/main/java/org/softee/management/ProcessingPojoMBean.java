@@ -43,9 +43,7 @@ import org.softee.management.exception.ManagementException;
  * @author morten.hattesen@gmail.com
  */
 @MBean(value="Generic MBean for monitoring input/output processing",
-    domain="org.softee",
-    type="org.softee.ProcessingMBean",
-    name="Default")
+        objectName="org.softee:name=Default,type=org.softee.ProcessingMBean")
 public class ProcessingPojoMBean extends AbstractPojoMBean {
 
     private AtomicLong inputCount;
@@ -65,13 +63,6 @@ public class ProcessingPojoMBean extends AbstractPojoMBean {
 
     public ProcessingPojoMBean(String name) throws MalformedObjectNameException {
         super(name);
-    }
-    public ProcessingPojoMBean(Class<?> type, String name) throws MalformedObjectNameException {
-        super(type, name);
-    }
-
-    public ProcessingPojoMBean(Package domain, Class<?> type, String name) throws MalformedObjectNameException {
-        super(domain, type, name);
     }
 
     /**
@@ -141,10 +132,14 @@ public class ProcessingPojoMBean extends AbstractPojoMBean {
         failedLatestCause = cause;
     }
 
-    // Used for debugging @Operation("Unregister and then register the MXBean monitor")
+    /**
+     * Used for debugging purposes, performs reregistering of MBean allowing remote debugging to take effect
+     * @throws ManagementException
+     */
+    // @Operation("Unregister and then register the MXBean monitor")
     public void reregisterMonitor() throws ManagementException {
-        unregister();
-        register();
+        registration.unregister();
+        registration.register();
     }
 
     @Override
@@ -178,7 +173,6 @@ public class ProcessingPojoMBean extends AbstractPojoMBean {
     public Long getInputLatestAgeSeconds() {
         return age(noneAsNull(inputLatest), SECONDS);
     }
-
 
     @Property("Number of processed messages")
     public long getOutputCount() {
