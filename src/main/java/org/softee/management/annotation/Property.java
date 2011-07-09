@@ -1,11 +1,10 @@
 package org.softee.management.annotation;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import org.softee.management.annotation.Property.Access;
 
 /**
  * Annotation for an MBean attributes.<p>
@@ -20,6 +19,7 @@ import org.softee.management.annotation.Property.Access;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})
+@Inherited
 public @interface Property {
     public enum Access {READ(true, false), WRITE(false, true), READ_WRITE(true, true);
         public final boolean canRead;
