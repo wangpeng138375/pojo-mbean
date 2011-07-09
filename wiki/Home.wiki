@@ -1,0 +1,17 @@
+#Home of the pojo-mbean project
+
+= Introduction =
+
+This is the home page of the pojo-mbean project.
+
+The pojo-mbean project was created to provide an easy-to-use method of exposing plain old Java beans (POJO's) as MBean's.
+
+The JMX 2.0 API specification should provide something similar at some point in the future (Java SE 7), but pojo-mbean project supports very lightweight MBean specification and deployment in Java SE 5 onwards.
+
+= Details =
+
+More details will follow, including:
+
+  * Java Source code examples (MBeans and instantiating them)
+  * Screen-shots of JConsole and JMX exposed MBeans
+  * Tips and tricks
