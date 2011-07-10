@@ -8,7 +8,7 @@ pojo-mbean sample application.
 
 The application runs until manually stopped.
 
-[/p/pojo-mbean/source/browse/trunk/src/main/java/org/softee/management/annotation/ManagedAttribute.java @ManagedAttribute] methods will be called from multiple threads (application as well as MBean server) and appropriate thread safety precautions must therefore be taken.
+[http://code.google.com/p/pojo-mbean/source/browse/trunk/src/main/java/org/softee/management/annotation/ManagedAttribute.java @ManagedAttribute] methods will be called from multiple threads (application as well as MBean server) and appropriate thread safety precautions must therefore be taken.
 
 These may include:
   * Make the methods synchronized
