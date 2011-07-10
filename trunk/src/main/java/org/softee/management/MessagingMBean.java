@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.softee.management.annotation.Description;
@@ -26,7 +27,7 @@ import org.softee.management.exception.ManagementException;
  *
  * @author morten.hattesen@gmail.com
  */
-@MBean(objectName="org.softee:name=Default,type=org.softee.MessagingMBean")
+@MBean(objectName="org.softee:type=org.softee.MessagingMBean,name=Default")
 @Description("Generic MBean for monitoring input/output processing")
 public class MessagingMBean extends AbstractMBean {
 
@@ -45,8 +46,16 @@ public class MessagingMBean extends AbstractMBean {
     private AtomicLong failedLatest;
     private Throwable failedLatestCause;
 
+    public MessagingMBean() throws MalformedObjectNameException {
+        super();
+    }
+
     public MessagingMBean(String name) throws MalformedObjectNameException {
         super(name);
+    }
+
+    public MessagingMBean(ObjectName objectName) {
+        super(objectName);
     }
 
     /**

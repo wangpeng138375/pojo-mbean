@@ -2,12 +2,26 @@ package org.softee.management;
 
 import java.util.concurrent.TimeUnit;
 
+import javax.management.MalformedObjectNameException;
+
+import org.softee.management.annotation.Description;
+import org.softee.management.annotation.MBean;
 import org.softee.time.StopWatch;
 
 public class DemoMBeanMain implements Runnable {
     private static final int DEMO_PROCESSING_TIME_MILLIS = 1000;
     private MessagingMBean monitor;
 
+    /**
+     * Subclass create purely to redefine the objectname and description
+     */
+    @MBean(objectName="org.softee:type=Demo,application=ESB,name=MessageMonitor")
+    @Description("An MBean created to show the ease of use of the pojo-mbean")
+    private class DemoMessagingMBean extends MessagingMBean {
+        public DemoMessagingMBean() throws MalformedObjectNameException {
+        }
+
+    }
     private DemoMBeanMain() {
 
     }
@@ -15,7 +29,7 @@ public class DemoMBeanMain implements Runnable {
     @Override
     public void run() {
         try {
-            monitor = new MessagingMBean("Demonstration");
+            monitor = new DemoMessagingMBean();
             start();
             runFor(1, TimeUnit.DAYS, DEMO_PROCESSING_TIME_MILLIS);
             shutdown();
