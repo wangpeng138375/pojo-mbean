@@ -21,8 +21,8 @@ Additionally, a number of helper classes and sample MBean implementations are in
 
 == Samples ==
 
-  * *[CountingApplication CountingApplication.java]* an example of what is required to expose an application as a Management Bean (MBean).
-  * many more to come...
+  * *[CountingApplication CountingApplication.java]* - serves as an example of how little is required to expose a class as a Management Bean (MBean).
+  * Many more to come...
 
 == JMX 2.0 and JSR-255 ==
 
