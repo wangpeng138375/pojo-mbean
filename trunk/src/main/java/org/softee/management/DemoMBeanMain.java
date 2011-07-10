@@ -17,7 +17,7 @@ public class DemoMBeanMain implements Runnable {
      */
     @MBean(objectName="org.softee:type=Demo,application=ESB,name=MessageMonitor")
     @Description("An MBean created to show the ease of use of the pojo-mbean")
-    private class DemoMessagingMBean extends MessagingMBean {
+    private static class DemoMessagingMBean extends MessagingMBean {
         public DemoMessagingMBean() throws MalformedObjectNameException {
         }
 
