@@ -4,10 +4,13 @@
 
 == Overview ==
 
-The pojo-mbean project was created to provide an easy-to-use method of exposing plain old Java beans (POJO's) as MBean's.
+The _pojo-mbean_ project was created to provide an easy-to-use method of exposing plain old Java beans (POJO's) as MBean's.
 
-pojo-mbean project provides a very lightweight MBean specification and deployment on Java SE 5 platform (onwards).
-pojo-mbean has *no dependencies* on any external libraries.
+_pojo-mbean_ provides a very lightweight annotation-based MBean specification and deployment on Java SE 5 platform (onwards).
+
+pojo-mbean has *no dependencies* on any external libraries, and may be deployed on any JRE 6.0 based systems.
+
+In the (near) future, we will look into supporting JRE 5.0 based systems as well. But quite likely with marginally restricted functionality.
 
 == Design ==
 
@@ -26,7 +29,7 @@ Additionally, a number of helper classes and sample MBean implementations are in
 
 == JMX 2.0 and JSR-255 ==
 
-The JMX 2.0 API specification should provide something similar to pojo-mbean at some point in the future.
+The JMX 2.0 API specification may provide something similar in terms of ease-of-use and short learning curve to _pojo-mbean_ at some point in the future.
 
 But while the JMX 2.0 was originally scheduled for inclusion Java SE 6, it clearly didn't make that milestone, and it isn't going to make it into Java SE 7. With little or no activity for years (since 2006), I wouldn't hold my breath for Java SE 8 either. The most recent update on the [http://jcp.org/en/jsr/detail?id=255#updates JSR-255  updates section] is: 
   _2006.01.20: This JSR is now scheduled for Dolphin (Java SE 7) and not Mustang_
