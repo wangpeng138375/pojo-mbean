@@ -22,7 +22,7 @@ import org.softee.management.annotation.ManagedOperation.Impact;
 import org.softee.management.exception.ManagementException;
 
 /**
- * Sample class for implementing commonly monitored metrics in a message processing system.
+ * Sample class for implementing commonly monitored metrics in a message processing system.<p>
  * This class may be extended, and new metrics (attributes and operations) may be added by applying annotations to the subclass
  *
  * @author morten.hattesen@gmail.com

@@ -1,15 +1,22 @@
-package org.softee.management;
+package org.softee.management.samples;
 
 import java.util.concurrent.TimeUnit;
 
 import javax.management.MalformedObjectNameException;
 
+import org.softee.management.MessagingMBean;
 import org.softee.management.annotation.Description;
 import org.softee.management.annotation.MBean;
 import org.softee.time.StopWatch;
 
-public class DemoMBeanMain implements Runnable {
-    private static final int DEMO_PROCESSING_TIME_MILLIS = 1000;
+/**
+ * This application simulates a message processing application, and uses the {@link MessagingMBean} for monitoring the
+ * processing metrics.
+ *
+ * @author morten.hattesen@gmail.com
+ */
+public class MessageProcesingApplication implements Runnable {
+    private static final int PROCESSING_TIME_MILLIS = 1000;
     private MessagingMBean monitor;
 
     /**
@@ -22,7 +29,7 @@ public class DemoMBeanMain implements Runnable {
         }
 
     }
-    private DemoMBeanMain() {
+    private MessageProcesingApplication() {
 
     }
 
@@ -31,7 +38,7 @@ public class DemoMBeanMain implements Runnable {
         try {
             monitor = new DemoMessagingMBean();
             start();
-            runFor(1, TimeUnit.DAYS, DEMO_PROCESSING_TIME_MILLIS);
+            runFor(1, TimeUnit.DAYS, PROCESSING_TIME_MILLIS);
             shutdown();
         } catch (Exception e) {
             e.printStackTrace();
@@ -46,7 +53,7 @@ public class DemoMBeanMain implements Runnable {
     }
 
     public static void main(String[] args) {
-        new DemoMBeanMain().run();
+        new MessageProcesingApplication().run();
     }
 
     public void runFor(int value, TimeUnit tu, int averageProcessingTimeMillis) {
