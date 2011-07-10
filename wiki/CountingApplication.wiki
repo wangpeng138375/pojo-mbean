@@ -16,9 +16,9 @@ These may include:
   * Make the methods synchronized
   * Include synchronized blocks around critical sections of the method
   * Make the fields volatile
-  * Use concurrent types, and use them in a thread safe manner (used in this example)
+  * Use concurrent types, and use them in a thread safe manner (AtomicInteger used in this example)
 
-For more information about concurrency and thread safety, I highly recommend the books "Effective Java", and "Concurrency in Practice".
+For more information about concurrency and thread safety, I highly recommend the books [http://books.google.com/books/about/Effective_Java.html?id=ka2VUBqHiWkC Effective Java], and [http://books.google.com/books?id=6LpQAAAAMAAJ Concurrency in Practice].
 
 == Application source ==
 
