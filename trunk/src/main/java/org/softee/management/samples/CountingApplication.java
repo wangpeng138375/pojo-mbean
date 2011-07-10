@@ -39,10 +39,9 @@ public class CountingApplication {
     /**
      * The counter that is made visible to both application and Management Agent (JConsole / JMX console)
      */
-    private final AtomicInteger counter;
+    private final AtomicInteger counter = new AtomicInteger();
 
     public CountingApplication() throws ManagementException, MalformedObjectNameException {
-        counter = new AtomicInteger();
         System.out.println("Registering MBean");
         /* in a "real" application, the registration instance would probably be
          * saved in a field for subsequent unregistration */
