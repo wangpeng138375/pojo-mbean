@@ -14,8 +14,10 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
@@ -35,7 +37,6 @@ import javax.management.MBeanParameterInfo;
 import javax.management.ReflectionException;
 
 import org.softee.management.annotation.Description;
-import org.softee.management.annotation.Descriptor.MetricType;
 import org.softee.management.annotation.MBean;
 import org.softee.management.annotation.ManagedAttribute;
 import org.softee.management.annotation.ManagedOperation;
@@ -309,6 +310,7 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
         // iterate over properties that are known to have ManagedAttribute annotations, sorted by name
         for (String propertyName : sortedKeys(propertyDescriptors)) {
             PropertyDescriptor property = propertyDescriptors.get(propertyName);
+            Class<?> propertyType = property.getPropertyType();
             Method readMethod = property.getReadMethod();
             Method writeMethod = property.getWriteMethod();
             boolean isReadable = null != getAnnotation(readMethod, ManagedAttribute.class);
@@ -317,7 +319,7 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
             Description descriptionAnnotation = getSingleAnnotation(property, Description.class, readMethod, writeMethod);
             String description = (descriptionAnnotation != null) ? descriptionAnnotation.value() : null;
             org.softee.management.annotation.Descriptor descriptorAnnotation = getSingleAnnotation(property, org.softee.management.annotation.Descriptor.class, readMethod, writeMethod);
-            Descriptor descriptor = createDescriptor(descriptorAnnotation);
+            Descriptor descriptor = createDescriptor(propertyType, descriptorAnnotation);
             // Now we have all the components to create the result
             MBeanAttributeInfo info = new MBeanAttributeInfo(
                     property.getName(),
@@ -333,23 +335,73 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
     }
 
     /**
-     * TODO add context parameter (Class or Method) containing the Descriptor annotation to be able to
      * introspect {@code @Deprecated} annotation and declaredType
      * @param descriptor the annotation
      * @return the MBean descriptor
      */
-    private Descriptor createDescriptor(org.softee.management.annotation.Descriptor descriptor) {
+    private Descriptor createDescriptor(Class<?> valueType, org.softee.management.annotation.Descriptor descriptor) {
         Map <String, Object> fields = new HashMap<String, Object>();
         if (descriptor != null) {
-            fields.put("units", descriptor.units());
-            if (descriptor.metricType() != MetricType.UNKNOWN) {
-                fields.put("metricType", descriptor.metricType().toString());
-            }
+            putStringValue(fields, "units", descriptor.units());
+            putStringValue(fields, "metricType", descriptor.metricType().value);
+            // Cast values
+            putTypedValue(fields, "minValue", descriptor.minValue(), valueType);
+            putTypedValue(fields, "maxValue", descriptor.maxValue(), valueType);
+            putTypedValue(fields, "defaultValue", descriptor.defaultValue(), valueType);
+            putTypedValueSet(fields, "legalValues", descriptor.legalValues(), valueType);
         }
         fields.put("enabled", Boolean.TRUE.toString());
         fields.put("mxbean", false);
         return new ImmutableDescriptor(fields);
     }
+
+    private boolean putStringValue(Map<String, Object> map, String key, String valueString) {
+        return putTypedValue(map, key, valueString, String.class);
+    }
+
+    private boolean putTypedValueSet(Map<String, Object> map, String key, String[] valueStrings, Class<?> valueType) {
+        // it should suffice with the last (length = 1, empty string), but it just seems plain wrong
+        int length = valueStrings.length;
+        if (length == 0 || (length == 1 && valueStrings[0].isEmpty())) {
+            return false;
+        }
+        Set<Object> values = new HashSet<Object>(length);
+        for (int i = 0; i < length; i++) {
+            String valueString = valueStrings[i];
+            Object value = asType(valueString, valueType);
+            values.add(value);
+        }
+        map.put(key, values);
+        return true;
+    }
+
+    private boolean putTypedValue(Map<String, Object> map, String key, String valueString, Class<?> valueType) {
+        if (valueString == null || valueString.isEmpty()) {
+            return false;
+        }
+        Object value = asType(valueString, valueType);
+        map.put(key, value);
+        return true;
+    }
+
+    /**
+     * FIXME add all simple types, wrapper types and BigXxxx types
+     * @param valueString the string representation of the {@code value}
+     * @param valueType the type that {@code value} should be coerced into
+     * @return {@code value} as type {@code type}
+     */
+    private static Object asType(String valueString, Class<?> valueType) {
+        if (String.class == valueType) {
+            return valueString;
+        } else if (Integer.TYPE == valueType || Integer.class == valueType) {
+            return Integer.valueOf(valueString);
+        } else if (Long.TYPE == valueType || Long.class == valueType) {
+            return Long.valueOf(valueString);
+        } else {
+            throw new IllegalArgumentException(String.format("Unable to convert value '%s' into %s", valueString, valueType));
+        }
+    }
+
 
     /**
      *
@@ -424,19 +476,4 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
         Collections.sort(keys);
         return keys;
     }
-
-    /**
-     * Chainable map putter, to allow more fluent declaration of maps
-     * @param <K> key type
-     * @param <V> value type
-     * @param map Map to put an entry into
-     * @param key key to put
-     * @param value value to put
-     * @return {@link map}
-     */
-    private <K, V> Map<K,V> put(Map<K,V>map, K key, V value) {
-        map.put(key, value);
-        return map;
-    }
-
 }
