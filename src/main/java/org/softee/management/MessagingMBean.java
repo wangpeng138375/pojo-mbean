@@ -15,6 +15,8 @@ import javax.management.ObjectName;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.softee.management.annotation.Description;
+import org.softee.management.annotation.Descriptor;
+import org.softee.management.annotation.Descriptor.MetricType;
 import org.softee.management.annotation.MBean;
 import org.softee.management.annotation.ManagedAttribute;
 import org.softee.management.annotation.ManagedOperation;
@@ -154,46 +156,55 @@ public class MessagingMBean extends AbstractMBean {
 
 
     @ManagedAttribute @Description("Number of messages received")
+    @Descriptor(units="messages", metricType=MetricType.COUNTER)
     public long getInputCount() {
         return inputCount.get();
     }
 
     @ManagedAttribute @Description("Time of last received message")
+    @Descriptor(metricType=MetricType.GAUGE)
     public XMLGregorianCalendar getInputLatest() {
         return date(noneAsNull(inputLatest));
     }
 
     @ManagedAttribute @Description("Time since latest received message (seconds)")
+    @Descriptor(units="seconds", metricType=MetricType.GAUGE)
     public Long getInputLatestAgeSeconds() {
         return age(noneAsNull(inputLatest), SECONDS);
     }
 
     @ManagedAttribute @Description("Number of processed messages")
+    @Descriptor(units="messages", metricType=MetricType.COUNTER)
     public long getOutputCount() {
         return outputCount.get();
     }
 
     @ManagedAttribute @Description("Time of the latest processed message")
+    @Descriptor(metricType=MetricType.GAUGE)
     public XMLGregorianCalendar getOutputLatest() {
         return date(noneAsNull(outputLatest));
    }
 
     @ManagedAttribute @Description("Time since latest processed message (seconds)")
+    @Descriptor(units="seconds", metricType=MetricType.GAUGE)
     public Long getOutputLatestAgeSeconds() {
         return age(noneAsNull(outputLatest), SECONDS);
     }
 
     @ManagedAttribute @Description("Processing time of the latest message (ms)")
+    @Descriptor(units="milliseconds", metricType=MetricType.GAUGE)
     public Long getDurationLatestMillis() {
         return noneAsNull(durationLastMillis);
     }
 
     @ManagedAttribute @Description("Total processing time of all messages (ms)")
+    @Descriptor(units="milliseconds", metricType=MetricType.GAUGE)
     public long getDurationTotalMillis() {
         return durationTotalMillis.get();
     }
 
     @ManagedAttribute @Description("Average processing time (ms)")
+    @Descriptor(units="milliseconds", metricType=MetricType.GAUGE)
     public Long getDurationAverageMillis() {
         long processedDurationTotalMillis = getDurationTotalMillis();
         long processedCount = getOutputCount();
@@ -201,26 +212,31 @@ public class MessagingMBean extends AbstractMBean {
     }
 
     @ManagedAttribute @Description("Min processing time (ms)")
+    @Descriptor(units="milliseconds", metricType=MetricType.GAUGE)
     public Long getDurationMinMillis() {
         return noneAsNull(durationMinMillis);
     }
 
     @ManagedAttribute @Description("Max processing time (ms)")
+    @Descriptor(units="milliseconds", metricType=MetricType.GAUGE)
     public Long getDurationMaxMillis() {
         return noneAsNull(durationMaxMillis);
     }
 
-    @ManagedAttribute @Description("Number of processes that failed")
+    @ManagedAttribute @Description("Number of processes that has failed")
+    @Descriptor(units="messages", metricType=MetricType.COUNTER)
     public long getFailedCount() {
         return failedCount.get();
     }
 
     @ManagedAttribute @Description("Time of the latest failed message processing")
+    @Descriptor(metricType=MetricType.GAUGE)
     public XMLGregorianCalendar getFailedLatest() {
         return date(noneAsNull(failedLatest));
     }
 
     @ManagedAttribute @Description("Time since latest failed message processing (seconds)")
+    @Descriptor(units="seconds", metricType=MetricType.GAUGE)
     public Long getFailedLatestAgeSeconds() {
         return age(noneAsNull(failedLatest), SECONDS);
     }
