@@ -1,6 +1,7 @@
 #summary A small sample application that shows how to MBean enable an existing application
-<p align="right"><g:plusone/></p>
 = !CountingApplication.java =
+
+<g:plusone/>
 
 <wiki:toc/>
 
