@@ -3,26 +3,6 @@
 = CountingApplication.java =
 
 {{{
-/**
- * pojo-mbean demonstration sample application.<p>
- *
- * The application runs until manually stopped.<p>
- *
- * @ManagedAttribute methods will be called from multiple threads (application as well as MBean server)
- * and appropriate thread safety precautions must therefore be taken.<br>
- * These may include:
- * <ul>
- * <li>Make the methods synchronized</li>
- * <li>Include synchronized blocks around critical sections of the method</li>
- * <li>Make the fields volatile</li>
- * <li>Use threadsafe types, and use them in a threadsafe manner (used in this example)</li>
- * </ul>
- *
- *  For more information about threadsafety, I hightly recommend the books
- *  "Effective Java", and "Concurrency in Practice".
- *
- * @author morten.hattesen@gmail.com
- */
 @MBean(objectName = "org.softee:type=Demo,name=CountingApplication")
 @Description("This Java application shows what is required expose a RW int property as an MBean")
 public class CountingApplication implements Callable<Object> {
