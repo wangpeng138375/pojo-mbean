@@ -13,9 +13,11 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.management.MalformedObjectNameException;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.softee.management.annotation.Description;
 import org.softee.management.annotation.MBean;
 import org.softee.management.annotation.ManagedAttribute;
 import org.softee.management.annotation.ManagedOperation;
+import org.softee.management.annotation.ManagedOperation.Impact;
 import org.softee.management.exception.ManagementException;
 
 /**
@@ -24,8 +26,8 @@ import org.softee.management.exception.ManagementException;
  *
  * @author morten.hattesen@gmail.com
  */
-@MBean(value="Generic MBean for monitoring input/output processing",
-        objectName="org.softee:name=Default,type=org.softee.MessagingMBean")
+@MBean(objectName="org.softee:name=Default,type=org.softee.MessagingMBean")
+@Description("Generic MBean for monitoring input/output processing")
 public class MessagingMBean extends AbstractMBean {
 
     private AtomicLong inputCount;
@@ -125,7 +127,8 @@ public class MessagingMBean extends AbstractMBean {
     }
 
     @Override
-    @ManagedOperation(value = "Reset the accumulated statistics", impact = ManagedOperation.Impact.ACTION)
+    @ManagedOperation(Impact.ACTION)
+    @Description("Reset the accumulated statistics")
     public synchronized void reset() {
         super.reset();
         inputLatest = none();
@@ -141,79 +144,79 @@ public class MessagingMBean extends AbstractMBean {
     }
 
 
-    @ManagedAttribute("Number of messages received")
+    @ManagedAttribute @Description("Number of messages received")
     public long getInputCount() {
         return inputCount.get();
     }
 
-    @ManagedAttribute("Time of last received message")
+    @ManagedAttribute @Description("Time of last received message")
     public XMLGregorianCalendar getInputLatest() {
         return date(noneAsNull(inputLatest));
     }
 
-    @ManagedAttribute("Time since latest received message (seconds)")
+    @ManagedAttribute @Description("Time since latest received message (seconds)")
     public Long getInputLatestAgeSeconds() {
         return age(noneAsNull(inputLatest), SECONDS);
     }
 
-    @ManagedAttribute("Number of processed messages")
+    @ManagedAttribute @Description("Number of processed messages")
     public long getOutputCount() {
         return outputCount.get();
     }
 
-    @ManagedAttribute("Time of the latest processed message")
+    @ManagedAttribute @Description("Time of the latest processed message")
     public XMLGregorianCalendar getOutputLatest() {
         return date(noneAsNull(outputLatest));
    }
 
-    @ManagedAttribute("Time since latest processed message (seconds)")
+    @ManagedAttribute @Description("Time since latest processed message (seconds)")
     public Long getOutputLatestAgeSeconds() {
         return age(noneAsNull(outputLatest), SECONDS);
     }
 
-    @ManagedAttribute("Processing time of the latest message (ms)")
+    @ManagedAttribute @Description("Processing time of the latest message (ms)")
     public Long getDurationLatestMillis() {
         return noneAsNull(durationLastMillis);
     }
 
-    @ManagedAttribute("Total processing time of all messages (ms)")
+    @ManagedAttribute @Description("Total processing time of all messages (ms)")
     public long getDurationTotalMillis() {
         return durationTotalMillis.get();
     }
 
-    @ManagedAttribute("Average processing time (ms)")
+    @ManagedAttribute @Description("Average processing time (ms)")
     public Long getDurationAverageMillis() {
         long processedDurationTotalMillis = getDurationTotalMillis();
         long processedCount = getOutputCount();
         return (processedCount != 0) ? processedDurationTotalMillis/processedCount : null;
     }
 
-    @ManagedAttribute("Min processing time (ms)")
+    @ManagedAttribute @Description("Min processing time (ms)")
     public Long getDurationMinMillis() {
         return noneAsNull(durationMinMillis);
     }
 
-    @ManagedAttribute("Max processing time (ms)")
+    @ManagedAttribute @Description("Max processing time (ms)")
     public Long getDurationMaxMillis() {
         return noneAsNull(durationMaxMillis);
     }
 
-    @ManagedAttribute("Number of processes that failed")
+    @ManagedAttribute @Description("Number of processes that failed")
     public long getFailedCount() {
         return failedCount.get();
     }
 
-    @ManagedAttribute("Time of the latest failed message processing")
+    @ManagedAttribute @Description("Time of the latest failed message processing")
     public XMLGregorianCalendar getFailedLatest() {
         return date(noneAsNull(failedLatest));
     }
 
-    @ManagedAttribute("Time since latest failed message processing (seconds)")
+    @ManagedAttribute @Description("Time since latest failed message processing (seconds)")
     public Long getFailedLatestAgeSeconds() {
         return age(noneAsNull(failedLatest), SECONDS);
     }
 
-    @ManagedAttribute("The failure reason of the latest failed message processing")
+    @ManagedAttribute @Description("The failure reason of the latest failed message processing")
     public String getFailedLatestReason() {
         if (failedLatestCause == null) {
             return null;
@@ -226,15 +229,13 @@ public class MessagingMBean extends AbstractMBean {
      * the elements will be presented one-per-line.<p>
      * If required, look into presenting in a composite or tabular form (see {@link javax.management.MXBean}
      */
-    @ManagedAttribute("The failure stacktrace of the latest failed message processing (one line per element)")
+    @ManagedAttribute @Description("The failure stacktrace of the latest failed message processing (one line per element)")
     public String[] getFailedLatestStacktrace() {
         if (failedLatestCause == null) {
             return null;
         }
         StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        failedLatestCause.printStackTrace(pw);
-        pw.close();
+        failedLatestCause.printStackTrace(new PrintWriter(sw));
         ArrayList<String> lines = new ArrayList<String>(1000);
         BufferedReader reader = new BufferedReader(new StringReader(sw.toString()));
         String line;
@@ -242,7 +243,7 @@ public class MessagingMBean extends AbstractMBean {
             while ((line = reader.readLine()) != null) {
                 lines.add(line);
             }
-        } catch (IOException e) {
+        } catch (IOException ignore) {
             // Impossible
         }
         return lines.toArray(new String[lines.size()]);

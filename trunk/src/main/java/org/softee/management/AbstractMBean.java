@@ -12,8 +12,10 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.softee.management.annotation.Description;
 import org.softee.management.annotation.ManagedAttribute;
 import org.softee.management.annotation.ManagedOperation;
+import org.softee.management.annotation.ManagedOperation.Impact;
 import org.softee.management.exception.ManagementException;
 import org.softee.management.helper.MBeanRegistration;
 import org.softee.management.helper.ObjectNameFactory;
@@ -76,7 +78,8 @@ public abstract class AbstractMBean {
         reset();
     }
 
-    @ManagedOperation(value = "Reset the MBean", impact = ManagedOperation.Impact.ACTION)
+
+    @ManagedOperation(Impact.ACTION) @Description("Reset the MBean")
     public void reset() {
         // Nothing to reset - shouldn't reset the start time
     }
@@ -99,7 +102,7 @@ public abstract class AbstractMBean {
     }
 
 
-    @ManagedAttribute("The time at which the MBean was started")
+    @ManagedAttribute @Description("The time at which the MBean was started")
     public XMLGregorianCalendar getStarted() {
         return date(noneAsNull(started));
     }

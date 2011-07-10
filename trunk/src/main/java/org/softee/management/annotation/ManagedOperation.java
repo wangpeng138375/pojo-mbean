@@ -26,12 +26,7 @@ public @interface ManagedOperation {
     }
 
     /**
-     * @return the textual description of the attribute to be displayed by the management agent
-     */
-    String value() default "";
-
-    /**
      * @resturn The impact of this operation
      */
-    Impact impact() default Impact.UNKNOWN;
+    Impact value() default Impact.UNKNOWN;
 }

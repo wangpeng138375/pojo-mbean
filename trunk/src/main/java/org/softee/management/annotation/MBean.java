@@ -16,11 +16,6 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface MBean {
     /**
-     * @return the textual description of the MBean to be displayed by the management agent
-     */
-    String value() default "";
-
-    /**
      * @return the ObjectName with which the MBean should be registered with the MBean server.<P>
      * Refer to {@link javax.management.ObjectName} for details of objectname syntax
      * Sample object names:<br>
