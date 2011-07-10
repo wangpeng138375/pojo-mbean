@@ -1,7 +1,25 @@
 #summary A small sample application that shows how to MBean enable an existing application
 #labels Sample,Java
 
-= CountingApplication.java =
+= CountingApp.java =
+
+<g:plusone size="medium" />
+
+pojo-mbean sample application.
+
+The application runs until manually stopped.
+
+@ManagedAttribute methods will be called from multiple threads (application as well as MBean server) and appropriate thread safety precautions must therefore be taken.
+
+These may include:
+  * Make the methods synchronized
+  * Include synchronized blocks around critical sections of the method
+  * Make the fields volatile
+  * Use concurrent types, and use them in a thread safe manner (used in this example)
+
+For more information about concurrency and thread safety, I highly recommend the books "Effective Java", and "Concurrency in Practice".
+
+*Full source: [http://code.google.com/p/pojo-mbean/source/browse/trunk/src/main/java/org/softee/management/samples/CountingApplication.java CountingApplication.java]*
 
 {{{
 @MBean(objectName = "org.softee:type=Demo,name=CountingApplication")
