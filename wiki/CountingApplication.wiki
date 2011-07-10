@@ -57,7 +57,7 @@ public class CountingApplication {
         this.counter.set(counter);
     }
 
-    @ManagedOperation(Impact.ACTION_INFO)
+    @ManagedOperation(Impact.ACTION_INFO) // Impact may be omitted
     @Description("Increments the counter by the requested amount and shows the resulting value")
     public int incrementCounter(
             @Parameter("amount") @Description("The amount to increment the counter with") int delta) {
