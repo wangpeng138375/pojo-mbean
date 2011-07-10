@@ -12,8 +12,8 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.softee.management.annotation.ManagedOperation;
 import org.softee.management.annotation.ManagedAttribute;
+import org.softee.management.annotation.ManagedOperation;
 import org.softee.management.exception.ManagementException;
 import org.softee.management.helper.MBeanRegistration;
 import org.softee.management.helper.ObjectNameFactory;
@@ -99,9 +99,9 @@ public abstract class AbstractMBean {
     }
 
 
-    @ManagedAttribute("The time when the monitor was started")
-    public String getStarted() {
-        return dateString(noneAsNull(started));
+    @ManagedAttribute("The time at which the MBean was started")
+    public XMLGregorianCalendar getStarted() {
+        return date(noneAsNull(started));
     }
 
     protected Long noneAsNull(AtomicLong a) {
@@ -118,10 +118,7 @@ public abstract class AbstractMBean {
      * @return millis formatted as an ISO 8601 (XML datetime) string
      */
     protected String dateString(Long millis) {
-        if (millis == null) {
-            return null;
-        }
-        return date(millis).toXMLFormat();
+        return (millis != null) ? date(millis).toXMLFormat() : null;
     }
 
     /**

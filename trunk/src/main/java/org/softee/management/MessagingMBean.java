@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.MalformedObjectNameException;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.softee.management.annotation.MBean;
 import org.softee.management.annotation.ManagedAttribute;
@@ -146,8 +147,8 @@ public class MessagingMBean extends AbstractMBean {
     }
 
     @ManagedAttribute("Time of last received message")
-    public String getInputLatest() {
-        return dateString(noneAsNull(inputLatest));
+    public XMLGregorianCalendar getInputLatest() {
+        return date(noneAsNull(inputLatest));
     }
 
     @ManagedAttribute("Time since latest received message (seconds)")
@@ -161,8 +162,8 @@ public class MessagingMBean extends AbstractMBean {
     }
 
     @ManagedAttribute("Time of the latest processed message")
-    public String getOutputLatest() {
-        return dateString(noneAsNull(outputLatest));
+    public XMLGregorianCalendar getOutputLatest() {
+        return date(noneAsNull(outputLatest));
    }
 
     @ManagedAttribute("Time since latest processed message (seconds)")
@@ -203,8 +204,8 @@ public class MessagingMBean extends AbstractMBean {
     }
 
     @ManagedAttribute("Time of the latest failed message processing")
-    public String getFailedLatest() {
-        return dateString(noneAsNull(failedLatest));
+    public XMLGregorianCalendar getFailedLatest() {
+        return date(noneAsNull(failedLatest));
     }
 
     @ManagedAttribute("Time since latest failed message processing (seconds)")
