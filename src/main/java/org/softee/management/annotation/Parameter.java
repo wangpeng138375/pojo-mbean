@@ -19,13 +19,8 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface Parameter {
     /**
-     * @return Optional description of the parameter
-     */
-    String value() default "";
-
-    /**
      * @return name of the parameter.
      */
-    String name();
+    String value();
 
 }

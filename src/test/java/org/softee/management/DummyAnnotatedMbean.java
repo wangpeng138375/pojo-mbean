@@ -1,22 +1,18 @@
 package org.softee.management;
 
+import org.softee.management.annotation.Description;
 import org.softee.management.annotation.MBean;
+import org.softee.management.annotation.ManagedAttribute;
 import org.softee.management.annotation.ManagedOperation;
 import org.softee.management.annotation.Parameter;
-import org.softee.management.annotation.ManagedAttribute;
-import org.softee.management.annotation.ManagedAttribute.Access;
 
-@MBean("DummyAnnotatedMbean")
+@MBean() @Description("DummyAnnotatedMbean")
 public class DummyAnnotatedMbean {
-    @ManagedAttribute(value = "integer", access=Access.WRITE)
     int integer;
     String string = "A string";
     String operationArgument;
 
-    @ManagedAttribute(access = ManagedAttribute.Access.READ_WRITE)
-    String ipsum;
-
-    @ManagedAttribute("string that can only be read")
+    @ManagedAttribute @Description("string that can only be read")
     public String getString() {
         return string;
     }
@@ -26,17 +22,18 @@ public class DummyAnnotatedMbean {
         string = value;
     }
 
-    @ManagedAttribute(value="A Lorem", access=ManagedAttribute.Access.READ)
+    @ManagedAttribute @Description("A Lorem")
     public String getLorem() {
         return "Here is a Lorem";
     }
 
 
-    @ManagedOperation("voidOneArgOperation")
-    public void voidOneArgOperation(@Parameter(value = "An argument", name = "argument") String argument) {
+    @ManagedOperation @Description("voidOneArgOperation")
+    public void voidOneArgOperation(@Parameter("argument") @Description("An argument") String argument) {
         operationArgument = argument;
     }
 
+    @ManagedAttribute @Description("integer")
     public void setInteger(int integer) {
         this.integer = integer;
     }
