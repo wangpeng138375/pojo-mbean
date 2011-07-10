@@ -1,7 +1,7 @@
 #summary A small sample application that shows how to MBean enable an existing application
 #labels Sample,Java
 
-= CountingApp.java =
+= !CountingApplication.java =
 
 <g:plusone size="medium" />
 
