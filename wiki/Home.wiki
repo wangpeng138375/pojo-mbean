@@ -1,11 +1,21 @@
 = pojo-mbean Wiki Home =
 
+<wiki:toc/>
+
 == Overview ==
 
 The pojo-mbean project was created to provide an easy-to-use method of exposing plain old Java beans (POJO's) as MBean's.
 
 pojo-mbean project provides a very lightweight MBean specification and deployment on Java SE 5 platform (onwards).
 pojo-mbean has *no dependencies* on any external libraries.
+
+== Design ==
+
+The design og pojo-mbean is quite simple, really.
+
+A number of annotations allow a POJO (Plain Old Java Object) classes to be marked as an [http://code.google.com/p/pojo-mbean/source/browse/trunk/src/main/java/org/softee/management/annotation/MBean.java MBean] and its [http://code.google.com/p/pojo-mbean/source/browse/trunk/src/main/java/org/softee/management/annotation/ManagedAttribute.java attributes], [http://code.google.com/p/pojo-mbean/source/browse/trunk/src/main/java/org/softee/management/annotation/ManagedOperation.java operations] and [http://code.google.com/p/pojo-mbean/source/browse/trunk/src/main/java/org/softee/management/annotation/Parameter.java parameters] to marked and [http://code.google.com/p/pojo-mbean/source/browse/trunk/src/main/java/org/softee/management/annotation/Description.java described].
+
+A (moderately complex) [http://code.google.com/p/pojo-mbean/source/browse/trunk/src/main/java/org/softee/management/helper/IntrospectedDynamicMBean.java IntrospectedDynamicMBean] class then introspects the annotated POJO bean, and exposes it as a [http://download.oracle.com/javase/6/docs/api/javax/management/DynamicMBean.html DynamicMBean], allowing it to be registered with an MBean server. Similar to how the [http://download.oracle.com/javase/6/docs/api/javax/management/StandardMBean.html javax.management.StandardMBean] exposes a traditional MBean/MXBean implementation/interface pair as a [http://download.oracle.com/javase/6/docs/api/javax/management/DynamicMBean.html DynamicMBean]
 
 == Samples ==
 
