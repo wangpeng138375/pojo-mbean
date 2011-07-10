@@ -30,10 +30,18 @@ public class ObjectNameFactory {
         return new ObjectName(objectName);
     }
 
-    public static ObjectName replaceProperty(ObjectName objectName, String name, String value) throws MalformedObjectNameException {
-        Hashtable<String, String> table = objectName.getKeyPropertyList();
+    /**
+     * @param template the template to use
+     * @param name the property name
+     * @param value the property value
+     * @return a new ObjectName, where the value of the {@code name} property is set to {@code value},
+     * possibly replacing an existing value
+     * @throws MalformedObjectNameException
+     */
+    public static ObjectName replaceProperty(ObjectName template, String name, String value) throws MalformedObjectNameException {
+        Hashtable<String, String> table = template.getKeyPropertyList();
         table.put(name, value);
-        return new ObjectName(objectName.getDomain(), table);
+        return new ObjectName(template.getDomain(), table);
     }
 
     /**
@@ -46,7 +54,7 @@ public class ObjectNameFactory {
      * @return an objectName constructed as above
      * @throws MalformedObjectNameException if one of the object name components is not well formed
      */
-    public static ObjectName createObjectName(String domain, String application, String name, String type) throws MalformedObjectNameException {
+    public static ObjectName createObjectName(String domain, String application, String type, String name) throws MalformedObjectNameException {
         StringBuilder sb = new StringBuilder(100);
         sb.append(notNull(domain, "domain"));
         addAttribute(sb, "application", application, false);

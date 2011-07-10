@@ -42,8 +42,8 @@ public class MBeanRegistration {
         this(mBean, new ObjectName(mBeanObjectName));
     }
 
-    public MBeanRegistration(Object mBean, String domain, String application, String name, String type) throws MalformedObjectNameException {
-        this(mBean, ObjectNameFactory.createObjectName(domain, application, name, type));
+    public MBeanRegistration(Object mBean, String domain, String application, String type, String name) throws MalformedObjectNameException {
+        this(mBean, ObjectNameFactory.createObjectName(domain, application, type, name));
     }
 
     /**
