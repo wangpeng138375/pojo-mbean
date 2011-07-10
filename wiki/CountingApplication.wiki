@@ -59,8 +59,8 @@ public class CountingApplication {
 
     @ManagedOperation(Impact.ACTION_INFO) // Impact may be omitted
     @Description("Increments the counter by the requested amount and shows the resulting value")
-    public int incrementCounter(
-            @Parameter("amount") @Description("The amount to increment the counter with") int delta) {
+    public int incrementCounter(@Parameter("amount") 
+            @Description("The amount to increment the counter with") int delta) {
         return counter.addAndGet(delta);
     }
 
