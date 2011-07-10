@@ -15,7 +15,7 @@ import org.softee.time.StopWatch;
  *
  * @author morten.hattesen@gmail.com
  */
-public class MessageProcesingApplication implements Runnable {
+public class MessageProcesingApplication {
     private static final int PROCESSING_TIME_MILLIS = 1000;
     private MessagingMBean monitor;
 
@@ -29,11 +29,7 @@ public class MessageProcesingApplication implements Runnable {
         }
 
     }
-    private MessageProcesingApplication() {
 
-    }
-
-    @Override
     public void run() {
         try {
             monitor = new DemoMessagingMBean();
