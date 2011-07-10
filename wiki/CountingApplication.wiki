@@ -2,7 +2,7 @@
 
 = !CountingApplication.java =
 
-<g:plusone/>
+<p align="right"><g:plusone/></p>
 
 pojo-mbean sample application.
 
