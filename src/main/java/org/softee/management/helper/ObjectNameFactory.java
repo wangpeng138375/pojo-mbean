@@ -14,6 +14,13 @@ import org.softee.management.annotation.MBean;
 public class ObjectNameFactory {
 
     /**
+     * Made non-instantiable
+     */
+    private ObjectNameFactory() {
+
+    }
+
+    /**
      * Construct an ObjectName using the object name attributes of the @MBean annotation
      * @throws MalformedObjectNameException if the object name is not wellformed
      */

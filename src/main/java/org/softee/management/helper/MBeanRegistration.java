@@ -12,6 +12,7 @@ import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 
+import org.softee.management.annotation.MBean;
 import org.softee.management.exception.ManagementException;
 
 public class MBeanRegistration {
@@ -33,13 +34,12 @@ public class MBeanRegistration {
     }
 
     /**
-     * Conventience method
-     * @param mBean
-     * @param objectName the MBean object name in string form
+     * Convenience method. Obtains the ObjectName from the {@link MBean} annotation
+     * @param mBean The {@link MBean} annotated bean.
      * @throws MalformedObjectNameException
      */
-    public MBeanRegistration(Object mBean, String mBeanObjectName) throws MalformedObjectNameException {
-        this(mBean, new ObjectName(mBeanObjectName));
+    public MBeanRegistration(Object mBean) throws MalformedObjectNameException {
+        this(mBean, ObjectNameFactory.createObjectName(mBean));
     }
 
     public MBeanRegistration(Object mBean, String domain, String application, String type, String name) throws MalformedObjectNameException {
