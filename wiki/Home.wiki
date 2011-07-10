@@ -20,7 +20,7 @@ A number of annotations allow a POJO (Plain Old Java Object) classes to be marke
 
 A (moderately complex) [http://code.google.com/p/pojo-mbean/source/browse/trunk/src/main/java/org/softee/management/helper/IntrospectedDynamicMBean.java IntrospectedDynamicMBean] class then introspects the annotated POJO bean, and exposes it as a [http://download.oracle.com/javase/6/docs/api/javax/management/DynamicMBean.html DynamicMBean], allowing it to be registered with an MBean server. Similar to how the [http://download.oracle.com/javase/6/docs/api/javax/management/StandardMBean.html javax.management.StandardMBean] exposes a traditional MBean/MXBean implementation/interface pair as a [http://download.oracle.com/javase/6/docs/api/javax/management/DynamicMBean.html DynamicMBean]
 
-Additionally, a number of helper classes and sample MBean implementations are included for documentation and easy extension.
+Additionally, a number of helper classes for ObjectName construction and MBean registration and a number of sample MBean implementations are included.
 
 == Samples ==
 
