@@ -21,7 +21,7 @@ For more information about concurrency and thread safety, I highly recommend the
 {{{
 @MBean(objectName = "org.softee:type=Demo,name=CountingApplication")
 @Description("This Java application shows what is required expose a RW int property as an MBean")
-public class CountingApplication implements Callable<Object> {
+public class CountingApplication {
     /**
      * The counter that is made visible to both application and Management Agent (JConsole / JMX console)
      */
@@ -36,11 +36,10 @@ public class CountingApplication implements Callable<Object> {
     }
 
     public static void main(String[] args) throws Exception {
-        new CountingApplication().call();
+        new CountingApplication().run();
     }
 
-    @Override
-    public Object call() throws Exception {
+    public Object run() throws Exception {
         for (;;) {
             System.out.println("counter = " + getCounter());
             incrementCounter(1);
