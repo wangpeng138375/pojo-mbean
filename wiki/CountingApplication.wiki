@@ -4,6 +4,10 @@
 
 <p align="right"><g:plusone/></p>
 
+<wiki:toc/>
+
+== Description of application ==
+
 pojo-mbean sample application.
 
 The application runs until manually stopped.
@@ -17,6 +21,8 @@ These may include:
   * Use concurrent types, and use them in a thread safe manner (used in this example)
 
 For more information about concurrency and thread safety, I highly recommend the books "Effective Java", and "Concurrency in Practice".
+
+== Application source ==
 
 {{{
 @MBean(objectName = "org.softee:type=Demo,name=CountingApplication")
