@@ -182,7 +182,7 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
     private MBeanInfo createMbeanInfo() throws IntrospectionException, javax.management.IntrospectionException, ManagementException {
         String description = description(mbeanClass);
         final MBeanAttributeInfo[] attributeInfo = createAttributeInfo(propertyDescriptors);
-        final MBeanConstructorInfo[] constructorInfo = constructorInfo();
+        final MBeanConstructorInfo[] constructorInfo = createConstructorInfo();
         final MBeanOperationInfo[] operationInfo = createOperationInfo();
         final MBeanNotificationInfo[] notificationInfo = createNotificationInfo();
         return new MBeanInfo(
@@ -272,7 +272,7 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
      * TODO should this be implemented?
      * @return null
      */
-    private MBeanConstructorInfo[] constructorInfo() {
+    private MBeanConstructorInfo[] createConstructorInfo() {
         return null;
     }
 
