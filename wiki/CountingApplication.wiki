@@ -83,15 +83,13 @@ _Full source: [http://code.google.com/p/pojo-mbean/source/browse/trunk/src/main/
 
 http://pojo-mbean.googlecode.com/svn/wiki/img/counting-jconsole-attributes.png
 
-=== showing operations ===
-
-http://pojo-mbean.googlecode.com/svn/wiki/img/counting-jconsole-operations.png
-
-
 === showing counter attribute ===
 
 http://pojo-mbean.googlecode.com/svn/wiki/img/counting-jconsole-counter.png
 
+=== showing operations ===
+
+http://pojo-mbean.googlecode.com/svn/wiki/img/counting-jconsole-operations.png
 
 === after calling increment operation ===
 
