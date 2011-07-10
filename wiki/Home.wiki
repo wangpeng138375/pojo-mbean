@@ -7,13 +7,9 @@ The pojo-mbean project was created to provide an easy-to-use method of exposing 
 pojo-mbean project provides a very lightweight MBean specification and deployment on Java SE 5 platform (onwards).
 pojo-mbean has *no dependencies* on any external libraries.
 
-== Details ==
+== Samples ==
 
-More details will follow, including:
-
-  * Java Source code examples (MBeans and instantiating them)
-  * Screen-shots of JConsole and JMX exposed MBeans
-  * Tips and tricks
+  * [CountingApplication CountingApplication.java]
 
 == JMX 2.0 and JSR-255 ==
 
