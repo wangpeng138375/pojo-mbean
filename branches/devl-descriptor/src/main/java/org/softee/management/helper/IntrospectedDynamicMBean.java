@@ -20,7 +20,9 @@ import java.util.Map;
 import javax.management.Attribute;
 import javax.management.AttributeList;
 import javax.management.AttributeNotFoundException;
+import javax.management.Descriptor;
 import javax.management.DynamicMBean;
+import javax.management.ImmutableDescriptor;
 import javax.management.IntrospectionException;
 import javax.management.InvalidAttributeValueException;
 import javax.management.MBeanAttributeInfo;
@@ -33,6 +35,7 @@ import javax.management.MBeanParameterInfo;
 import javax.management.ReflectionException;
 
 import org.softee.management.annotation.Description;
+import org.softee.management.annotation.Descriptor.MetricType;
 import org.softee.management.annotation.MBean;
 import org.softee.management.annotation.ManagedAttribute;
 import org.softee.management.annotation.ManagedOperation;
@@ -308,18 +311,44 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
             PropertyDescriptor property = propertyDescriptors.get(propertyName);
             Method readMethod = property.getReadMethod();
             Method writeMethod = property.getWriteMethod();
-            boolean readable = null != getAnnotation(readMethod, ManagedAttribute.class);
-            boolean writable = null != getAnnotation(writeMethod, ManagedAttribute.class);
+            boolean isReadable = null != getAnnotation(readMethod, ManagedAttribute.class);
+            boolean isWritable = null != getAnnotation(writeMethod, ManagedAttribute.class);
+            boolean isIs = isReadable && readMethod.getName().startsWith("is");
             Description descriptionAnnotation = getSingleAnnotation(property, Description.class, readMethod, writeMethod);
             String description = (descriptionAnnotation != null) ? descriptionAnnotation.value() : null;
+            org.softee.management.annotation.Descriptor descriptorAnnotation = getSingleAnnotation(property, org.softee.management.annotation.Descriptor.class, readMethod, writeMethod);
+            Descriptor descriptor = createDescriptor(descriptorAnnotation);
+            // Now we have all the components to create the result
             MBeanAttributeInfo info = new MBeanAttributeInfo(
                     property.getName(),
+                    property.getPropertyType().getName(),
                     description,
-                    readable ? readMethod : null,
-                    writable ? writeMethod : null);
+                    isReadable,
+                    isWritable,
+                    isIs,
+                    descriptor);
             infos[i++] = info;
         }
         return infos;
+    }
+
+    /**
+     * TODO add context parameter (Class or Method) containing the Descriptor annotation to be able to
+     * introspect {@code @Deprecated} annotation and declaredType
+     * @param descriptor the annotation
+     * @return the MBean descriptor
+     */
+    private Descriptor createDescriptor(org.softee.management.annotation.Descriptor descriptor) {
+        Map <String, Object> fields = new HashMap<String, Object>();
+        if (descriptor != null) {
+            fields.put("units", descriptor.units());
+            if (descriptor.metricType() != MetricType.UNKNOWN) {
+                fields.put("metricType", descriptor.metricType().toString());
+            }
+        }
+        fields.put("enabled", Boolean.TRUE.toString());
+        fields.put("mxbean", false);
+        return new ImmutableDescriptor(fields);
     }
 
     /**
@@ -394,6 +423,20 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
         List<String> keys = new ArrayList<String>(map.keySet());
         Collections.sort(keys);
         return keys;
+    }
+
+    /**
+     * Chainable map putter, to allow more fluent declaration of maps
+     * @param <K> key type
+     * @param <V> value type
+     * @param map Map to put an entry into
+     * @param key key to put
+     * @param value value to put
+     * @return {@link map}
+     */
+    private <K, V> Map<K,V> put(Map<K,V>map, K key, V value) {
+        map.put(key, value);
+        return map;
     }
 
 }
