@@ -1,4 +1,5 @@
 #summary A small sample application that shows how to MBean enable an existing application
+#labels Sample,Java
 
 = CountingApplication.java =
 
