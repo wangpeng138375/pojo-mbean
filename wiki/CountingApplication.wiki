@@ -8,7 +8,7 @@ pojo-mbean sample application.
 
 The application runs until manually stopped.
 
-[http://code.google.com/p/pojo-mbean/source/browse/trunk/src/main/java/org/softee/management/annotation/ManagedAttribute.java @ManagedAttribute] methods will be called from multiple threads (application as well as MBean server) and appropriate thread safety precautions must therefore be taken.
+[/p/pojo-mbean/source/browse/trunk/src/main/java/org/softee/management/annotation/ManagedAttribute.java @ManagedAttribute] methods will be called from multiple threads (application as well as MBean server) and appropriate thread safety precautions must therefore be taken.
 
 These may include:
   * Make the methods synchronized
@@ -17,8 +17,6 @@ These may include:
   * Use concurrent types, and use them in a thread safe manner (used in this example)
 
 For more information about concurrency and thread safety, I highly recommend the books "Effective Java", and "Concurrency in Practice".
-
-*Full source: [http://code.google.com/p/pojo-mbean/source/browse/trunk/src/main/java/org/softee/management/samples/CountingApplication.java CountingApplication.java]*
 
 {{{
 @MBean(objectName = "org.softee:type=Demo,name=CountingApplication")
@@ -73,3 +71,5 @@ public class CountingApplication implements Callable<Object> {
     }
 }
 }}}
+
+_Full source: [http://code.google.com/p/pojo-mbean/source/browse/trunk/src/main/java/org/softee/management/samples/CountingApplication.java CountingApplication.java]_
