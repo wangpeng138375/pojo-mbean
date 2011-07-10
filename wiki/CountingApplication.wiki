@@ -1,9 +1,8 @@
 #summary A small sample application that shows how to MBean enable an existing application
-#labels Sample,Java
 
 = !CountingApplication.java =
 
-<g:plusone size="medium" />
+<g:plusone/>
 
 pojo-mbean sample application.
 
