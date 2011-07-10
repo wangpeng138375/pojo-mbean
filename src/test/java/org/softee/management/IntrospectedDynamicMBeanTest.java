@@ -42,7 +42,7 @@ public class IntrospectedDynamicMBeanTest {
         assertEquals(annotatedMBean.string, attribute.getValue());
     }
 
-    @Test(expected=InvalidAttributeValueException.class)
+    @Test(expected = InvalidAttributeValueException.class)
     public void testSetAttributeIllegalType() throws Exception {
         Attribute attribute = new Attribute("integer", "42");
         introspectedMBean.setAttribute(attribute);

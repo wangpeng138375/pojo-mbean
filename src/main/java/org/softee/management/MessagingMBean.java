@@ -27,7 +27,7 @@ import org.softee.management.exception.ManagementException;
  *
  * @author morten.hattesen@gmail.com
  */
-@MBean(objectName="org.softee:type=org.softee.MessagingMBean,name=Default")
+@MBean(objectName = "org.softee:type=org.softee.MessagingMBean,name=Default")
 @Description("Generic MBean for monitoring input/output processing")
 public class MessagingMBean extends AbstractMBean {
 

@@ -282,7 +282,7 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
      */
     private Map<String, PropertyDescriptor> createPropertyDescriptors(BeanInfo beanInfo) throws ManagementException {
         Map<String, PropertyDescriptor> properties = new HashMap<String, PropertyDescriptor>();
-        for (PropertyDescriptor property: beanInfo.getPropertyDescriptors()) {
+        for (PropertyDescriptor property : beanInfo.getPropertyDescriptors()) {
             ManagedAttribute getterAnnotation = getAnnotation(property.getReadMethod(), ManagedAttribute.class);
             ManagedAttribute setterAnnotation = getAnnotation(property.getWriteMethod(), ManagedAttribute.class);
             if ((getterAnnotation != null || setterAnnotation != null)) {
@@ -363,8 +363,9 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
     private static <A extends Annotation> A getParameterAnnotation(Method method,
             int index, Class<A> annotationClass) {
         for (Annotation a : method.getParameterAnnotations()[index]) {
-            if (annotationClass.isInstance(a))
+            if (annotationClass.isInstance(a)) {
                 return annotationClass.cast(a);
+            }
         }
         return null;
     }
