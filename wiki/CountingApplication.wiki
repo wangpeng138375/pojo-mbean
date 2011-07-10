@@ -77,20 +77,26 @@ public class CountingApplication {
 
 _Full source: [http://code.google.com/p/pojo-mbean/source/browse/trunk/src/main/java/org/softee/management/samples/CountingApplication.java CountingApplication.java]_
 
-== jconsole (showing attributes) ==
+==jconsole screenshots ==
+
+=== showing attributes ===
 
 http://pojo-mbean.googlecode.com/svn/wiki/img/counting-jconsole-attributes.png
 
-== jconsole (showing operations) ==
+=== showing operations ===
 
 http://pojo-mbean.googlecode.com/svn/wiki/img/counting-jconsole-operations.png
 
 
-== jconsole (showing counter attribute) ==
+=== showing counter attribute ===
 
 http://pojo-mbean.googlecode.com/svn/wiki/img/counting-jconsole-counter.png
 
 
-== jconsole (after calling increment operation) ==
+=== after calling increment operation ===
 
 http://pojo-mbean.googlecode.com/svn/wiki/img/counting-jconsole-increment.png
+
+== JMX Console screenshots ==
+
+Soon to be arriving at a browser near you ;-)
