@@ -32,13 +32,10 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.PARAMETER})
 @Inherited
 public @interface Descriptor {
-    public enum MetricType {UNKNOWN, COUNTER, GAUGE;
-        /**
-         * MetricType values are lower case
-         */
-        @Override
-        public String toString() {
-            return super.toString().toLowerCase();
+    public enum MetricType {UNKNOWN(null), COUNTER("counter"), GAUGE("gauge");
+    public final String value;
+        private MetricType(String value) {
+            this.value = value;
         }
     };
 

@@ -5,6 +5,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.management.MalformedObjectNameException;
 
 import org.softee.management.annotation.Description;
+import org.softee.management.annotation.Descriptor;
+import org.softee.management.annotation.Descriptor.MetricType;
 import org.softee.management.annotation.MBean;
 import org.softee.management.annotation.ManagedAttribute;
 import org.softee.management.annotation.ManagedOperation;
@@ -62,6 +64,7 @@ public class CountingApplication {
     }
 
     @ManagedAttribute @Description("A counter variable")
+    @Descriptor(metricType=MetricType.COUNTER, minValue="0")
     public int getCounter() {
         return counter.get();
     }
@@ -74,7 +77,9 @@ public class CountingApplication {
     @ManagedOperation(Impact.ACTION_INFO) // Impact may be omitted
     @Description("Increments the counter by the requested amount and shows the resulting value")
     public int incrementCounter(
-            @Parameter("amount") @Description("The amount to increment the counter with") int delta) {
+            @Parameter("amount")
+            @Description("The amount to increment the counter with")
+            @Descriptor(minValue="0") int delta) {
         return counter.addAndGet(delta);
     }
 
