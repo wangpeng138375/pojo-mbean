@@ -3,7 +3,7 @@
 
     <groupId>org.softee</groupId>
     <artifactId>pojo-mbean</artifactId>
-    <version>1.0</version>
+    <version>1.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>pojo-mbean</name>
@@ -26,9 +26,9 @@
     </parent>
 
     <scm>
-        <connection>scm:svn:http://pojo-mbean.googlecode.com/svn/tags/pojo-mbean-1.0</connection>
-        <developerConnection>scm:svn:https://pojo-mbean.googlecode.com/svn/tags/pojo-mbean-1.0</developerConnection>
-        <url>http://pojo-mbean.googlecode.com/svn/tags/pojo-mbean-1.0</url>
+        <connection>scm:svn:http://pojo-mbean.googlecode.com/svn/trunk/</connection>
+        <developerConnection>scm:svn:https://pojo-mbean.googlecode.com/svn/trunk/</developerConnection>
+        <url>http://pojo-mbean.googlecode.com/svn/trunk/</url>
     </scm>
 
     <developers>
