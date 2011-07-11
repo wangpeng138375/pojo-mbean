@@ -1,0 +1,5 @@
+/* This is an Eclipse Scrap jpage used for quick evaluation */
+
+javax.xml.datatype.DatatypeFactory.newInstance().newXMLGregorianCalendar(new java.util.GregorianCalendar()).toString();
+
+(java.lang.String) 2011-07-10T02:35:04.241+02:00
