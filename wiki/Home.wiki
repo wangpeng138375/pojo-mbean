@@ -42,3 +42,7 @@ To learn about the JMX 2.0 API ([http://jcp.org/en/jsr/detail?id=255 JSR 255]) h
 Follow the guide:
 
 https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide
+
+== Maven Repository ==
+
+https://oss.sonatype.org
