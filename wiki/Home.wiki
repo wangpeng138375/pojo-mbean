@@ -36,3 +36,9 @@ But while the JMX 2.0 was originally scheduled for inclusion Java SE 6, it clear
 - and the JSR 255 status is marked as _inactive_.
 
 To learn about the JMX 2.0 API ([http://jcp.org/en/jsr/detail?id=255 JSR 255]) have a look at the JMX Spec Lead Eamonn !McManus' [http://weblogs.java.net/blog/emcmanus/archive/2007/08/defining_mbeans.html post on java.net].
+
+== Build and Deployment ==
+
+Follow the guide:
+
+https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide
