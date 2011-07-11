@@ -37,14 +37,24 @@ But while the JMX 2.0 was originally scheduled for inclusion JDK 6.0, it clearly
   _2006.01.20: This JSR is now scheduled for Dolphin (Java SE 7) and not Mustang_
 - and the JSR 255 status is marked as _inactive_. So it's clear that JSR 255 is not getting a lot of attention these days.
 
-
-
 == Build and Deployment ==
 
-Follow the guide:
+=== Maven 2 ===
 
-https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide
+_pojo-mbean_ uses Maven 2 as its build system.
 
-== Maven Repository ==
+If you use Maven 2, you'll be pleased to know, that _pojo-mbean_ is available through the Maven Central repository. Simply add this to the `<dependencies>` section:
 
-https://oss.sonatype.org
+{{{
+<dependency>
+    <groupId>org.softee</groupId>
+    <artifactId>pojo-mbean</artifactId>
+    <version>1.0</version>
+<dependency>
+}}}
+
+For other versions, and to download build artifacts (jar, sources-jar and javadoc.jar) refer to https://oss.sonatype.org/index.html#nexus-search;quick~pojo-mbean
+
+== Mroject Member's section ==
+
+Here are the instructions for build/deployment setup at Sonatype, who have been kind enough to host this project: https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide
