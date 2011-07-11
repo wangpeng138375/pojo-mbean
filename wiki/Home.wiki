@@ -14,7 +14,7 @@ In the (near) future, we will look into supporting JRE 5.0 based systems as well
 
 == Design ==
 
-The design og pojo-mbean is quite simple.
+The design of pojo-mbean is quite simple.
 
 A number of annotations allow a POJO (Plain Old Java Object) classes to be marked as an [http://code.google.com/p/pojo-mbean/source/browse/trunk/src/main/java/org/softee/management/annotation/MBean.java MBean] and its [http://code.google.com/p/pojo-mbean/source/browse/trunk/src/main/java/org/softee/management/annotation/ManagedAttribute.java attributes], [http://code.google.com/p/pojo-mbean/source/browse/trunk/src/main/java/org/softee/management/annotation/ManagedOperation.java operations] and [http://code.google.com/p/pojo-mbean/source/browse/trunk/src/main/java/org/softee/management/annotation/Parameter.java parameters] to be marked and [http://code.google.com/p/pojo-mbean/source/browse/trunk/src/main/java/org/softee/management/annotation/Description.java described].
 
