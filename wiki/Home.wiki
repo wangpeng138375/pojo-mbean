@@ -50,7 +50,7 @@ If you use Maven 2, you'll be pleased to know, that _pojo-mbean_ is available th
     <groupId>org.softee</groupId>
     <artifactId>pojo-mbean</artifactId>
     <version>1.0</version>
-<dependency>
+</dependency>
 }}}
 
 For other versions, and to download build artifacts (jar, sources-jar and javadoc.jar) directly, refer to https://oss.sonatype.org/content/repositories/releases/org/softee/pojo-mbean/
