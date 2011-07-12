@@ -53,8 +53,8 @@ If you use Maven 2, you'll be pleased to know, that _pojo-mbean_ is available th
 <dependency>
 }}}
 
-For other versions, and to download build artifacts (jar, sources-jar and javadoc.jar) refer to https://oss.sonatype.org/index.html#nexus-search;quick~pojo-mbean
+For other versions, and to download build artifacts (jar, sources-jar and javadoc.jar) directly, refer to https://oss.sonatype.org/content/repositories/releases/org/softee/pojo-mbean/
 
 == Project Member's Section ==
 
-Here are the instructions for build/deployment setup at Sonatype, who have been kind enough to host this project: https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide
+Here are the instructions for build/deployment setup at Sonatype, who are host ing build artifacts for this project: https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide
