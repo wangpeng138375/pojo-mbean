@@ -10,7 +10,7 @@ _pojo-mbean_ provides a very lightweight annotation-based MBean specification an
 
 pojo-mbean has *no dependencies* on any external libraries, and may be deployed on any JRE 6.0 based systems.
 
-In the (near) future, we will look into supporting JRE 5.0 based systems as well. But quite likely with marginally restricted functionality.
+In the near future, we will be supporting JRE 5.0 based systems as well.
 
 == Design ==
 
