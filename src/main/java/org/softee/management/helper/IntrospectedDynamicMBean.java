@@ -89,6 +89,9 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
                     format("Getter method for attribute %s of %s", attribute, mbeanClass));
         }
         try {
+            if (!getter.isAccessible()) {
+                getter.setAccessible(true);
+            }
             return getter.invoke(mbean);
         } catch (Exception e) {
             throw new RuntimeException(
@@ -125,6 +128,9 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
         }
         Object value = attribute.getValue();
         try {
+            if (!setter.isAccessible()) {
+                setter.setAccessible(true);
+            }
             setter.invoke(mbean, value);
         } catch (IllegalArgumentException e) {
             throw new InvalidAttributeValueException(String.format("attribute %s, value = (%s)%s, expected (%s)",
@@ -164,9 +170,12 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
         Method method = operationMethods.get(actionName);
         //TODO verify that the right signature is picked to avoid throwing an IllegalArgumentException
         try {
+            if (!method.isAccessible()) {
+                method.setAccessible(true);
+            }
             return method.invoke(mbean, params);
         } catch (Exception e) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(e);
         }
 
     }
