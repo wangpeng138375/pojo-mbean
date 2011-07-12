@@ -29,7 +29,7 @@ public class MBeanRegistration {
 
     /**
      * @param mBean an MBean instance in the form of a traditional MBean (implementing a sibling *MBean interface) or an
-     * MXBean (implementing an interface annotated with @MXBean), or an instance implementing the DynamicMBean interface.
+     * MXBean (implementing an interface annotated with {@code @MXBean}), or an instance implementing the DynamicMBean interface.
      * @param mBeanObjectName the object name with which {@code mBean} will be registered
      */
     public MBeanRegistration(Object mBean, ObjectName mBeanObjectName) {
