@@ -1,5 +1,5 @@
 #summary A small sample application that shows how to MBean enable an existing application
-<g:plusone/>
+
 = !CountingApplication.java =
 
 <wiki:toc/>
