@@ -67,7 +67,8 @@ public class CountingApplication {
     public void reset() {
         counter.set(0);
     }
-}}}}
+}
+}}}
 
 _Full source: [http://code.google.com/p/pojo-mbean/source/browse/trunk/src/main/java/org/softee/management/samples/CountingApplication.java CountingApplication.java]_
 
