@@ -12,7 +12,6 @@ import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 
-import org.softee.management.annotation.MBean;
 import org.softee.management.exception.ManagementException;
 
 public class MBeanRegistration {
@@ -21,7 +20,14 @@ public class MBeanRegistration {
     private final MBeanServer mBeanServer;
 
     /**
-     *
+     * @param mBean an MBean instance annotated with {@link @MBean} containing an objectName attribute
+     * @throws MalformedObjectNameException
+     */
+    public MBeanRegistration(Object mBean) throws MalformedObjectNameException {
+        this(mBean, new ObjectNameBuilder(mBean.getClass()).build());
+    }
+
+    /**
      * @param mBean an MBean instance in the form of a traditional MBean (implementing a sibling *MBean interface) or an
      * MXBean (implementing an interface annotated with @MXBean), or an instance implementing the DynamicMBean interface.
      * @param mBeanObjectName the object name with which {@code mBean} will be registered
@@ -30,21 +36,8 @@ public class MBeanRegistration {
         this.mBean = mBean;
         this.mBeanObjectName = mBeanObjectName;
         mBeanServer = ManagementFactory.getPlatformMBeanServer();
-
     }
 
-    /**
-     * Convenience method. Obtains the ObjectName from the {@link MBean} annotation
-     * @param mBean The {@link MBean} annotated bean.
-     * @throws MalformedObjectNameException
-     */
-    public MBeanRegistration(Object mBean) throws MalformedObjectNameException {
-        this(mBean, ObjectNameFactory.createObjectName(mBean));
-    }
-
-    public MBeanRegistration(Object mBean, String domain, String application, String type, String name) throws MalformedObjectNameException {
-        this(mBean, ObjectNameFactory.createObjectName(domain, application, type, name));
-    }
 
     /**
      * Register the MXBean.
