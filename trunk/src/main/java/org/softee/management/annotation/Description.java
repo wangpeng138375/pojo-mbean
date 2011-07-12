@@ -1,7 +1,6 @@
 package org.softee.management.annotation;
 
 import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -17,7 +16,6 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.PARAMETER})
-@Inherited
 public @interface Description {
     /**
      * @return The descriptive text of the MBean feature being annotated ({@link MBean}, {@link ManagedAttribute},
