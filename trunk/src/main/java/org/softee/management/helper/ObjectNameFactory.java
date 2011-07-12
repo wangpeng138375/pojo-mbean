@@ -14,7 +14,7 @@ import org.softee.management.annotation.MBean;
 public class ObjectNameFactory {
 
     /**
-     * Made non-instantiable
+     * Static factory methods, non-instantiable
      */
     private ObjectNameFactory() {
 
@@ -22,13 +22,21 @@ public class ObjectNameFactory {
 
     /**
      * Construct an ObjectName using the object name attributes of the @MBean annotation
+     * @param mBean the MBean instance that is to be introspected for the @MBean annotation
      * @throws MalformedObjectNameException if the object name is not wellformed
      */
     public static ObjectName createObjectName(Object mBean) throws MalformedObjectNameException {
-        Class<? extends Object> clazz = mBean.getClass();
-        MBean annotation = clazz.getAnnotation(MBean.class);
+        return createObjectName(mBean.getClass());
+    }
+    /**
+     * Construct an ObjectName using the object name attributes of the @MBean annotation
+     * @param mBeanClass the MBean instance that is to be introspected for the @MBean annotation
+     * @throws MalformedObjectNameException if the object name is not wellformed
+     */
+    public static ObjectName createObjectName(Class<?> mBeanClass) throws MalformedObjectNameException {
+        MBean annotation = mBeanClass.getAnnotation(MBean.class);
         if (annotation == null) {
-            throw new MalformedObjectNameException(format("%s is not annotated with @%s", clazz, MBean.class.getName()));
+            throw new MalformedObjectNameException(format("%s is not annotated with @%s", mBeanClass, MBean.class.getName()));
         }
         String objectName = annotation.objectName();
         if (objectName.isEmpty()) {
