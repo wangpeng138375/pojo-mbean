@@ -137,9 +137,9 @@ public class MessagingMBean extends AbstractMBean {
 
     @Override
     @ManagedOperation(Impact.ACTION)
-    @Description("Reset the accumulated statistics")
-    public synchronized void reset() {
-        super.reset();
+    @Description("Reset this MBean's metrics")
+    public synchronized void resetMBean() {
+        super.resetMBean();
         inputLatest = none();
         outputLatest = none();
         failedLatest = none();

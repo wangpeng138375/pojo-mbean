@@ -18,8 +18,7 @@ import org.softee.management.annotation.ManagedOperation;
 import org.softee.management.annotation.ManagedOperation.Impact;
 import org.softee.management.exception.ManagementException;
 import org.softee.management.helper.MBeanRegistration;
-import org.softee.management.helper.ObjectNameFactory;
-import org.softee.util.Preconditions;
+import org.softee.management.helper.ObjectNameBuilder;
 
 /**
  * An abstract base-class for generating Pojo MBeans that are capable of registering and unregistering themselves.
@@ -35,25 +34,24 @@ public abstract class AbstractMBean {
     private AtomicLong started;
     protected final MBeanRegistration registration;
 
-
-    /**
-     * Construct an MBean using the objectName attribute of the @MBean annotation
-     * @param mbeanName the name property of the ObjectName with which to override the name from the @MBean annotation
-     * @throws MalformedObjectNameException if either domain, type or name is not specified
-     */
-    public AbstractMBean(String mbeanName) throws MalformedObjectNameException {
-        ObjectName baseName = ObjectNameFactory.createObjectName(this);
-        ObjectName objectName = ObjectNameFactory.replaceProperty(baseName, "name", Preconditions.notNull(mbeanName));
-        registration = new MBeanRegistration(this, objectName);
-        initialize();
-    }
-
     /**
      * Construct an MBean using the objectName attribute of the @MBean annotation
      * @throws MalformedObjectNameException if either domain, type or name is not specified
      */
     public AbstractMBean() throws MalformedObjectNameException {
-        registration = new MBeanRegistration(this, ObjectNameFactory.createObjectName(this));
+        ObjectName objectName = new ObjectNameBuilder(getClass()).build();
+        registration = new MBeanRegistration(this, objectName);
+        initialize();
+    }
+
+    /**
+     * Construct an MBean using the objectName attribute of the @MBean annotation of the current instance class
+     * @param mbeanName the name property of the ObjectName with which to override the name property from the @MBean annotation
+     * @throws MalformedObjectNameException if either domain, type or name is not specified
+     */
+    public AbstractMBean(String mbeanName) throws MalformedObjectNameException {
+        ObjectName objectName = new ObjectNameBuilder(getClass()).withName(mbeanName).build();
+        registration = new MBeanRegistration(this, objectName);
         initialize();
     }
 
@@ -74,13 +72,13 @@ public abstract class AbstractMBean {
             throw new RuntimeException(e);
         }
 
-        // Reset all stats
-        reset();
+        resetMBean(); // Reset all stats
     }
 
 
-    @ManagedOperation(Impact.ACTION) @Description("Reset the MBean")
-    public void reset() {
+    @ManagedOperation(Impact.ACTION)
+    @Description("Reset this MBean's metrics")
+    public void resetMBean() {
         // Nothing to reset - shouldn't reset the start time
     }
 
@@ -150,6 +148,4 @@ public abstract class AbstractMBean {
     protected AtomicLong none() {
         return new AtomicLong(NONE);
     }
-
-
 }
