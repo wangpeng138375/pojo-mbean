@@ -43,7 +43,7 @@ But while the JMX 2.0 was originally scheduled for inclusion JDK 6.0, it clearly
 
 _pojo-mbean_ uses Maven 2 as its build system.
 
-If you use Maven 2, you'll be pleased to know, that _pojo-mbean_ is available through the Maven Central repository. Simply add this to the `<dependencies>` section:
+If you use Maven 2, you'll be pleased to know, that _pojo-mbean_ is available through the Maven Central repository. Simply add this xml fragment to the `<dependencies>` section of your `pom.xml`:
 
 {{{
 <dependency>
