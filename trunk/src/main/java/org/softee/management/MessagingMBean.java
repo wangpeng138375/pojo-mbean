@@ -143,6 +143,7 @@ public class MessagingMBean extends AbstractMBean {
         inputLatest = none();
         outputLatest = none();
         failedLatest = none();
+        failedLatestCause = null;
         inputCount = zero();
         outputCount = zero();
         failedCount = zero();
