@@ -77,7 +77,6 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
 
 
     // @Override commented out for JDK 5 compatibility
-    @Override
     public Object getAttribute(String attribute) throws AttributeNotFoundException,
             MBeanException, ReflectionException {
         PropertyDescriptor propertyDescriptor = propertyDescriptors.get(attribute);
@@ -101,7 +100,6 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
     }
 
     // @Override commented out for JDK 5 compatibility
-    @Override
     public AttributeList getAttributes(String[] attributeNames) {
         AttributeList attributes = new AttributeList(attributeNames.length);
         for (String attributeName : attributeNames) {
@@ -117,7 +115,6 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
     }
 
     // @Override commented out for JDK 5 compatibility
-    @Override
     public void setAttribute(Attribute attribute) throws AttributeNotFoundException,
     InvalidAttributeValueException, MBeanException, ReflectionException {
         String name = attribute.getName();
@@ -148,7 +145,6 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
     }
 
     // @Override commented out for JDK 5 compatibility
-    @Override
     public AttributeList setAttributes(AttributeList attributes) {
         for (Object object : attributes) {
             Attribute attribute = (Attribute) object;
@@ -164,13 +160,11 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
     }
 
     // @Override commented out for JDK 5 compatibility
-    @Override
     public MBeanInfo getMBeanInfo() {
         return mbeanInfo;
     }
 
     // @Override commented out for JDK 5 compatibility
-    @Override
     public Object invoke(String actionName, Object[] params, String[] signature)
             throws MBeanException, ReflectionException {
         Method method = operationMethods.get(actionName);
