@@ -30,6 +30,9 @@ import javax.management.MBeanInfo;
 import javax.management.MBeanNotificationInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.MBeanParameterInfo;
+import javax.management.MBeanRegistration;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
 import org.softee.management.annotation.Description;
@@ -45,9 +48,10 @@ import org.softee.management.exception.ManagementException;
  * @author morten.hattesen@gmail.com
  *
  */
-public class IntrospectedDynamicMBean implements DynamicMBean {
+public class IntrospectedDynamicMBean implements DynamicMBean, MBeanRegistration {
     private final Object mbean;
     private final Class<?> mbeanClass;
+    private final MBeanRegistration registrationDelegate;
     private final Map<String, PropertyDescriptor> propertyDescriptors;
     private final Map<String, Method> operationMethods;
     private final MBeanInfo mbeanInfo;
@@ -63,6 +67,8 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
             throw new ManagementException(
                     format("MBean %s is not annotated with @%s", mbeanClass, MBean.class.getName()));
         }
+        registrationDelegate = (MBeanRegistration) ((mbean instanceof MBeanRegistration) ? mbean
+                : new MBeanRegistrationBase());
         try {
             BeanInfo beanInfo = Introspector.getBeanInfo(mbeanClass);
             propertyDescriptors = createPropertyDescriptors(beanInfo);
@@ -404,4 +410,19 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
         return keys;
     }
 
+    public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception {
+        return registrationDelegate.preRegister(server, name);
+    }
+
+    public void postRegister(Boolean registrationDone) {
+        registrationDelegate.postRegister(registrationDone);
+    }
+
+    public void postDeregister() {
+        registrationDelegate.postDeregister();
+    }
+
+    public void preDeregister() throws Exception {
+        registrationDelegate.preDeregister();
+    }
 }
