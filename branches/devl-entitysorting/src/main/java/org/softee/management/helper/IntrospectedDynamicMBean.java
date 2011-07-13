@@ -7,11 +7,11 @@ import java.beans.Introspector;
 import java.beans.MethodDescriptor;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -77,6 +77,7 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
 
 
     // @Override commented out for JDK 5 compatibility
+    @Override
     public Object getAttribute(String attribute) throws AttributeNotFoundException,
             MBeanException, ReflectionException {
         PropertyDescriptor propertyDescriptor = propertyDescriptors.get(attribute);
@@ -100,6 +101,7 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
     }
 
     // @Override commented out for JDK 5 compatibility
+    @Override
     public AttributeList getAttributes(String[] attributeNames) {
         AttributeList attributes = new AttributeList(attributeNames.length);
         for (String attributeName : attributeNames) {
@@ -115,6 +117,7 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
     }
 
     // @Override commented out for JDK 5 compatibility
+    @Override
     public void setAttribute(Attribute attribute) throws AttributeNotFoundException,
     InvalidAttributeValueException, MBeanException, ReflectionException {
         String name = attribute.getName();
@@ -145,6 +148,7 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
     }
 
     // @Override commented out for JDK 5 compatibility
+    @Override
     public AttributeList setAttributes(AttributeList attributes) {
         for (Object object : attributes) {
             Attribute attribute = (Attribute) object;
@@ -160,11 +164,13 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
     }
 
     // @Override commented out for JDK 5 compatibility
+    @Override
     public MBeanInfo getMBeanInfo() {
         return mbeanInfo;
     }
 
     // @Override commented out for JDK 5 compatibility
+    @Override
     public Object invoke(String actionName, Object[] params, String[] signature)
             throws MBeanException, ReflectionException {
         Method method = operationMethods.get(actionName);
@@ -188,18 +194,13 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
      * @throws ManagementException
      */
     private MBeanInfo createMbeanInfo() throws IntrospectionException, ManagementException {
-        String description = description(mbeanClass);
-        final MBeanAttributeInfo[] attributeInfo = createAttributeInfo(propertyDescriptors);
-        final MBeanConstructorInfo[] constructorInfo = createConstructorInfo();
-        final MBeanOperationInfo[] operationInfo = createOperationInfo();
-        final MBeanNotificationInfo[] notificationInfo = createNotificationInfo();
         return new MBeanInfo(
                 mbeanClass.getName(),
-                description,
-                attributeInfo,
-                constructorInfo,
-                operationInfo,
-                notificationInfo);
+                description(mbeanClass),
+                createAttributeInfo(propertyDescriptors),
+                createConstructorInfo(),
+                createOperationInfo(operationMethods),
+                createNotificationInfo());
     }
 
     /**
@@ -237,11 +238,14 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
      * @return an MBeanOPerationInfo array that describes the {@link ManagedOperation} annotated methods of the operationMethods
      * @throws ManagementException
      */
-    private MBeanOperationInfo[] createOperationInfo() throws ManagementException {
+    private MBeanOperationInfo[] createOperationInfo(Map<String, Method> operationMethods) throws ManagementException {
         MBeanOperationInfo[] operationInfos = new MBeanOperationInfo[operationMethods.size()];
         int operationIndex = 0;
+        Map<String, String> sortNameToName = methodSortNameToNameMap(operationMethods.values());
+
         // Iterate in method name order
-        for (String methodName : sortedKeys(operationMethods)) {
+        for (String sortName : sortedKeys(sortNameToName)) {
+            String methodName = sortNameToName.get(sortName);
             Method method = operationMethods.get(methodName);
             ManagedOperation annotation = method.getAnnotation(ManagedOperation.class);
             // add description and names to parameters
@@ -311,14 +315,16 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
     private MBeanAttributeInfo[] createAttributeInfo(Map<String, PropertyDescriptor> propertyDescriptors) throws ManagementException, IntrospectionException {
         MBeanAttributeInfo[] infos = new MBeanAttributeInfo[propertyDescriptors.size()];
         int i = 0;
-        // iterate over properties that are known to have ManagedAttribute annotations, sorted by name
-        for (String propertyName : sortedKeys(propertyDescriptors)) {
+        Map<String, String> sortNameToName = propertySortNameToNameMap(propertyDescriptors.values());
+        // iterate over properties that are known to have ManagedAttribute annotations, sorted by sort name
+        for (String sortName : sortedKeys(sortNameToName)) {
+            String propertyName = sortNameToName.get(sortName);
             PropertyDescriptor property = propertyDescriptors.get(propertyName);
             Method readMethod = property.getReadMethod();
             Method writeMethod = property.getWriteMethod();
             boolean readable = null != getAnnotation(readMethod, ManagedAttribute.class);
             boolean writable = null != getAnnotation(writeMethod, ManagedAttribute.class);
-            Description descriptionAnnotation = getSingleAnnotation(property, Description.class, readMethod, writeMethod);
+            Description descriptionAnnotation = getSingleAnnotation(Description.class, readMethod, writeMethod);
             String description = (descriptionAnnotation != null) ? descriptionAnnotation.value() : null;
             MBeanAttributeInfo info = new MBeanAttributeInfo(
                     property.getName(),
@@ -340,17 +346,17 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
      * or null if none of the entities are annotated with annotationClass
      * @throws ManagementException if more than one of the entities are annotated with annotationClass
      */
-    private <T extends Annotation> T getSingleAnnotation(PropertyDescriptor property, Class<T> annotationClass,
-            AccessibleObject... entities) throws ManagementException {
+    private <T extends Annotation> T getSingleAnnotation(Class<T> annotationClass,
+            AnnotatedElement... entities) throws ManagementException {
         T result = null;
-        for (AccessibleObject entity : entities) {
+        for (AnnotatedElement entity : entities) {
             if (entity != null) {
                 T annotation = entity.getAnnotation(annotationClass);
                 if (annotation != null) {
                     if (result != null) {
                         throw new ManagementException(
-                                String.format("Multiple %s annotations found for property %s of %s",
-                                        annotationClass.getName(), property.getName(), mbeanClass));
+                                String.format("Multiple %s annotations found for a property on %s, %s",
+                                        annotationClass.getName(), mbeanClass, entity));
                     }
                     result = annotation;
                 }
@@ -385,8 +391,40 @@ public class IntrospectedDynamicMBean implements DynamicMBean {
      * @param annotationClass
      * @return the annotation, if element is not null and the annotation is present. Otherwise null
      */
-    private <A extends Annotation> A getAnnotation(AnnotatedElement element, Class<A> annotationClass) {
+    private static <A extends Annotation> A getAnnotation(AnnotatedElement element, Class<A> annotationClass) {
         return (element != null) ? element.getAnnotation(annotationClass) : null;
+    }
+
+    private static Map<String, String> methodSortNameToNameMap(Collection<Method> methods) {
+        // sort-name to method name map
+        Map<String, String> sortMap = new HashMap<String, String>(methods.size());
+        for (Method method : methods) {
+            String name = method.getName();
+            String sortAs = sortedAs(name, method).toLowerCase();
+            sortMap.put(sortAs, name);
+        }
+        return sortMap;
+    }
+
+    private static Map<String, String> propertySortNameToNameMap(Collection<PropertyDescriptor> properties) {
+        // sort-name to property name map
+        Map<String, String> sortMap = new HashMap<String, String>(properties.size());
+        for (PropertyDescriptor property : properties) {
+            String name = property.getName();
+            String sortAs = sortedAs(name, property.getReadMethod(), property.getWriteMethod()).toLowerCase();
+            sortMap.put(sortAs, name);
+        }
+        return sortMap;
+    }
+
+    private static String sortedAs(String defaultSort, AnnotatedElement... elements) {
+        for (AnnotatedElement element : elements) {
+            Description annotation = getAnnotation(element, Description.class);
+            if (annotation != null && !annotation.sortAs().isEmpty()) {
+                return annotation.sortAs();
+            }
+        }
+        return defaultSort;
     }
 
     private static String description(AnnotatedElement element) {
