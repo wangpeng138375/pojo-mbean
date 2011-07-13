@@ -8,9 +8,7 @@ The _pojo-mbean_ project was created to provide an easy-to-use method of exposin
 
 _pojo-mbean_ provides a very lightweight annotation-based MBean specification and deployment on Java SE 5 platform (onwards).
 
-pojo-mbean has *no dependencies* on any external libraries, and may be deployed on any JRE 6.0 based systems.
-
-In the near future, we will be supporting JRE 5.0 based systems as well.
+pojo-mbean has *no dependencies* on any external libraries, and may be deployed on any JRE 5.0 (or later) based systems.
 
 == Design ==
 
