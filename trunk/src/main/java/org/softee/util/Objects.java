@@ -19,18 +19,4 @@ public class Objects {
         }
         throw new NullPointerException("All null arguments");
     }
-
-    /**
-     * An assertion method that makes null validation more fluent
-     * @param <E> The type of elements
-     * @param obj an Object
-     * @return {@code obj}
-     * @throws NullPointerException if {@code obj} is null
-     */
-    public static <E> E notNull(E obj) {
-        if (obj == null) {
-            throw new NullPointerException();
-        }
-        return obj;
-    }
 }
