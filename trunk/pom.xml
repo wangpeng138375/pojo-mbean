@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.softee</groupId>
@@ -38,8 +40,8 @@
             <email>morten.hattesen@gmail.com</email>
         </developer>
         <developer>
-            <id>anders.andersen</id>
-            <name>Anders Andersen</name>
+            <id>sejersbol</id>
+            <name>Anders Sejersbøl</name>
             <email>anders@aoq.dk</email>
         </developer>
     </developers>
