@@ -21,5 +21,11 @@ public @interface Description {
      * @return The descriptive text of the MBean feature being annotated ({@link MBean}, {@link ManagedAttribute},
      *  {@link ManagedOperation} or  {@link Parameter})
      */
-    String value();
+    String value() default "";
+
+    /**
+     * @return A string that should be used for sorting the annotated element ({@link ManagedAttribute} or {@link ManagedOperation})
+     * in the MBean server client (e.g. jconsole). Note that sorting is done ignoring upper/lower case.
+     */
+    String sortAs() default "";
 }
