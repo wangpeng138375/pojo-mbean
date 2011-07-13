@@ -1,6 +1,10 @@
 package org.softee.util;
 
 public class Preconditions {
+
+    private Preconditions() {
+    }
+
     /**
      * An assertion method that makes null validation more fluent
      * @param <E> The type of elements
