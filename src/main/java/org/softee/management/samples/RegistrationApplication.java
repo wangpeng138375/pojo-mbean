@@ -25,10 +25,11 @@ public class RegistrationApplication implements javax.management.MBeanRegistrati
     public void run() throws Exception {
         /* in a "real" application, the registration instance would probably be
          * saved in a field for subsequent unregistration */
+        System.out.println("Running " + getClass());
         new MBeanRegistration(this).register();
         for (;;) {
-            System.out.println("Running " + getClass());
-            Thread.sleep(10000);
+            System.out.print('.');
+            Thread.sleep(1000);
         }
     }
 

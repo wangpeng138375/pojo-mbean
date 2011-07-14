@@ -15,6 +15,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Inherited
 public @interface MBean {
+    public static enum AutomaticType {ATTRIBUTE, OPERATION};
+
     /**
      * @return the ObjectName with which the MBean should be registered with the MBean server.<P>
      * Refer to {@link javax.management.ObjectName} for details of objectname syntax
@@ -23,4 +25,6 @@ public @interface MBean {
      * org.softee.management:application=ESB,name=MyBean,type=org.softee.management.ProcessingMonitor
      */
     String objectName() default "";
+
+    AutomaticType[] automatic() default {};
 }
