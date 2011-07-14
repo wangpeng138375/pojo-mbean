@@ -34,7 +34,7 @@ public class MessageProcesingApplication {
         try {
             monitor = new DemoMessagingMBean();
             start();
-            runFor(1, TimeUnit.DAYS, PROCESSING_TIME_MILLIS);
+            runFor(1, TimeUnit.HOURS, PROCESSING_TIME_MILLIS);
             shutdown();
         } catch (Exception e) {
             e.printStackTrace();
