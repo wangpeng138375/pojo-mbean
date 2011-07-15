@@ -41,7 +41,7 @@ public class CountingApplication {
         new CountingApplication().run();
     }
 
-    public void run() throws Exception {
+    private void run() throws Exception {
         /* in a "real" application, the registration instance would probably be
          * saved in a field for subsequent unregistration */
         new MBeanRegistration(this).register();
