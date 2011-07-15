@@ -14,6 +14,16 @@ import javax.management.ObjectName;
 
 import org.softee.management.exception.ManagementException;
 
+/**
+ *
+ * This class assists in registering MBeans with an MBeanServer.<p>
+ *
+ * This class, unfortunately, has a name that may cause confusion, since it doesn't implement the
+ * {@link javax.management.MBeanRegistration} interface.
+ *
+ * @author morten.hattesen@gmail.com
+ *
+ */
 public class MBeanRegistration {
     private final Object mBean;
     private final ObjectName mBeanObjectName;
