@@ -7,9 +7,8 @@ import org.softee.management.annotation.ManagedOperation;
 public class ServiceMBean {
     public static enum State {
         NEW, STARTED, RUNNING, PAUSED, STOPPED, FAILED, TERMINATED;
-        private State next;
-
     }
+
     private State state;
 
     @ManagedAttribute
