@@ -8,7 +8,7 @@ import org.softee.management.annotation.MBean;
 import org.softee.management.helper.MBeanRegistration;
 
 /**
- * pojo-mbean sample application.<p>
+ * pojo-mbean sample application showing how MBeanRegistration callbacks are achieved.<p>
  *
  * The application runs until manually stopped.<p>
  *
