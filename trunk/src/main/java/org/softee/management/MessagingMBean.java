@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.MalformedObjectNameException;
@@ -37,10 +38,11 @@ public class MessagingMBean extends AbstractMBean {
     private AtomicLong outputCount;
     private AtomicLong outputLatest;
 
-    private AtomicLong durationLastMillis;
-    private AtomicLong durationTotalMillis;
-    private AtomicLong durationMaxMillis;
-    private AtomicLong durationMinMillis;
+    private TimeUnit durationUnit;
+    private AtomicLong durationLatest;
+    private AtomicLong durationTotal;
+    private AtomicLong durationMax;
+    private AtomicLong durationMin;
 
     private AtomicLong failedCount;
     private AtomicLong failedLatest;
@@ -84,26 +86,41 @@ public class MessagingMBean extends AbstractMBean {
         }
     }
 
+
     /**
      * Notify that a message has been successfully processed (output)
      * @param durationMillis The duration of the processing in milliseconds
+     * @Deprecated Use notifyOutput(long, TimeUnit)
      */
+    @Deprecated
     public synchronized void notifyOutput(long durationMillis) {
+        notifyOutput(durationMillis, TimeUnit.MILLISECONDS);
+    }
+
+    /**
+     * TODO Change to storing duration fields plus TimeUnit
+     * Notify that a message has been successfully processed (output)
+     * @param durationMillis The duration of the processing in milliseconds
+     * @param inUnit The time unit of the {@code duration}
+     */
+    public void notifyOutput(long inDuration, TimeUnit inUnit) {
+        // convert incoming duration to the unit we work with
+        long workDuration = durationUnit.convert(inDuration, inUnit);
         outputLatest.set(now());
         outputCount.incrementAndGet();
 
-        if (durationMillis >= 0) {
-            durationLastMillis.set(durationMillis);
-            durationTotalMillis.addAndGet(durationMillis);
+        if (workDuration >= 0) {
+            durationLatest.set(workDuration);
+            durationTotal.addAndGet(workDuration);
 
-            Long minMillis = getDurationMinMillis();
-            if ((minMillis == null) || (minMillis != null && durationMillis < minMillis)) {
-                durationMinMillis.set(durationMillis);
+            Long minMillis = getDurationMin();
+            if ((minMillis == null) || (minMillis != null && workDuration < minMillis)) {
+                durationMin.set(workDuration);
             }
 
-            Long maxMillis = getDurationMaxMillis();
-            if ((maxMillis == null) || (durationMillis > maxMillis)) {
-                durationMaxMillis.set(durationMillis);
+            Long maxMillis = getDurationMax();
+            if ((maxMillis == null) || (workDuration > maxMillis)) {
+                durationMax.set(workDuration);
             }
         }
     }
@@ -147,10 +164,11 @@ public class MessagingMBean extends AbstractMBean {
         inputCount = zero();
         outputCount = zero();
         failedCount = zero();
-        durationLastMillis = none();
-        durationMinMillis = none();
-        durationMaxMillis = none();
-        durationTotalMillis = zero();
+        durationUnit = TimeUnit.MILLISECONDS;
+        durationLatest = none();
+        durationMin = none();
+        durationMax = none();
+        durationTotal = zero();
     }
 
 
@@ -184,31 +202,69 @@ public class MessagingMBean extends AbstractMBean {
         return age(noneAsNull(outputLatest), SECONDS);
     }
 
-    @ManagedAttribute @Description("Processing time of the latest message (ms)")
-    public Long getDurationLatestMillis() {
-        return noneAsNull(durationLastMillis);
+    /**
+     * Method named {@link #getDuration()} to force it to appear above any other "durationXxx" attributes in
+     * the MBean server client
+     */
+    @ManagedAttribute
+    public String getDuration() {
+        return durationUnit.toString();
+    }
+
+    /**
+     *
+     * @param durationName the name of the new duration time unit.<br>
+     * May be abbreviated, e.g. "S" => "SECONDS". not null. Not empty.
+     */
+    @ManagedAttribute @Description("The time unit of the reported durations."
+            + "One of: NANOSECONDS, MICROSECONDS, MILLISECONDS, SECONDS, MINUTES, HOURS, DAY. May be abbreviated.")
+    public void setDuration(final String durationName) {
+        final String trimName = (durationName != null) ? durationName.trim() : null;
+        if (durationName == null || trimName.isEmpty()) {
+            throw new IllegalArgumentException("Empty value not allowed");
+        }
+        for (TimeUnit unit : TimeUnit.values()) {
+            if (unit.toString().toUpperCase().startsWith(trimName.toUpperCase())) {
+                setDurationUnit(unit);
+                return;
+            }
+        }
+        throw new IllegalArgumentException("Unknown time unit: '" + trimName + "'");
+    }
+
+    public TimeUnit getDurationUnit() {
+        return durationUnit;
+    }
+
+    public void setDurationUnit(TimeUnit durationUnit) {
+        this.durationUnit = durationUnit;
+    }
+
+     @ManagedAttribute @Description("Processing time of the latest message (ms)")
+    public Long getDurationLatest() {
+        return noneAsNull(durationLatest);
     }
 
     @ManagedAttribute @Description("Total processing time of all messages (ms)")
-    public long getDurationTotalMillis() {
-        return durationTotalMillis.get();
+    public long getDurationTotal() {
+        return durationTotal.get();
     }
 
     @ManagedAttribute @Description("Average processing time (ms)")
-    public Long getDurationAverageMillis() {
-        long processedDurationTotalMillis = getDurationTotalMillis();
+    public Long getDurationAverage() {
+        long processedDurationTotalMillis = getDurationTotal();
         long processedCount = getOutputCount();
         return (processedCount != 0) ? processedDurationTotalMillis/processedCount : null;
     }
 
     @ManagedAttribute @Description("Min processing time (ms)")
-    public Long getDurationMinMillis() {
-        return noneAsNull(durationMinMillis);
+    public Long getDurationMin() {
+        return noneAsNull(durationMin);
     }
 
     @ManagedAttribute @Description("Max processing time (ms)")
-    public Long getDurationMaxMillis() {
-        return noneAsNull(durationMaxMillis);
+    public Long getDurationMax() {
+        return noneAsNull(durationMax);
     }
 
     @ManagedAttribute @Description("Number of processes that failed")
