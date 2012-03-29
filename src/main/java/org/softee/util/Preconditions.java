@@ -30,4 +30,16 @@ public class Preconditions {
         }
         return obj;
     }
+
+    public static String notEmpty(String s) {
+        return notEmpty(s, null);
+    }
+
+    public static String notEmpty(String s, String msg) {
+        notNull(s, msg);
+        if (s.isEmpty()) {
+            throw (msg == null) ? new NullPointerException("empty") : new NullPointerException(msg);
+        }
+        return s;
+    }
 }
