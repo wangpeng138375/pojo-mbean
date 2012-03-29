@@ -196,6 +196,9 @@ public class IntrospectedDynamicMBean implements DynamicMBean, MBeanRegistration
             throws MBeanException, ReflectionException {
         Method method = operationMethods.get(actionName);
         //TODO verify that the right signature is picked to avoid throwing an IllegalArgumentException
+        if (method == null) {
+            throw new IllegalArgumentException("No such operation: " + actionName);
+        }
         try {
             if (!method.isAccessible()) {
                 method.setAccessible(true);
@@ -216,7 +219,8 @@ public class IntrospectedDynamicMBean implements DynamicMBean, MBeanRegistration
      * @throws javax.management.IntrospectionException
      * @throws ManagementException
      */
-    private static MBeanInfo createMbeanInfo(Class<?> mbeanClass, Map<String, PropertyDescriptor> propertyDescriptors, Map<String, Method> operationMethods) throws IntrospectionException, ManagementException {
+    private static MBeanInfo createMbeanInfo(Class<?> mbeanClass, Map<String, PropertyDescriptor> propertyDescriptors,
+            Map<String, Method> operationMethods) throws IntrospectionException, ManagementException {
         String description = description(mbeanClass);
         final MBeanAttributeInfo[] attributeInfo = createAttributeInfo(propertyDescriptors);
         final MBeanConstructorInfo[] constructorInfo = createConstructorInfo();
@@ -266,6 +270,7 @@ public class IntrospectedDynamicMBean implements DynamicMBean, MBeanRegistration
                 // This method is an operation
                 Method old = operationMethods.put(method.getName(), method);
                 if (old != null) {
+                    //TODO support multiple identically named operation methods
                     throw new ManagementException(format("Multiple Operation annotations for operation %s of %s",
                             method.getName(), old.getDeclaringClass()));
                 }
@@ -326,7 +331,7 @@ public class IntrospectedDynamicMBean implements DynamicMBean, MBeanRegistration
 
     /**
      *
-     * @param method an operation or attribute getter/setter method
+     * @param clazz a class or interface
      * @param autoType the type of auto annotation to check for
      * @return true if {@code method}'s declaring class is annotated with {@link MBean} that includes {@code autoType} in
      * its {@link MBean#automatic()} attribute

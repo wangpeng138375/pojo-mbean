@@ -7,10 +7,11 @@ import org.softee.management.annotation.ManagedOperation;
 import org.softee.management.annotation.Parameter;
 
 @MBean() @Description("DummyAnnotatedMbean")
-public class DummyAnnotatedMbean {
+public class DummyAnnotatedMbean implements DummyMbeanInterface {
     int integer;
     String string = "A string";
     String operationArgument;
+    final String lorem = "Here is a Lorem";
 
     @ManagedAttribute @Description("string that can only be read")
     public String getString() {
@@ -24,7 +25,7 @@ public class DummyAnnotatedMbean {
 
     @ManagedAttribute @Description("A Lorem")
     public String getLorem() {
-        return "Here is a Lorem";
+        return lorem;
     }
 
 
