@@ -39,7 +39,7 @@ public abstract class AbstractMBean {
      * @throws MalformedObjectNameException if either domain, type or name is not specified
      */
     public AbstractMBean() throws MalformedObjectNameException {
-        ObjectName objectName = new ObjectNameBuilder(getClass()).build();
+        ObjectName objectName = new ObjectNameBuilder().withObjectName(getClass()).build();
         registration = new MBeanRegistration(this, objectName);
         initialize();
     }
@@ -50,7 +50,7 @@ public abstract class AbstractMBean {
      * @throws MalformedObjectNameException if either domain, type or name is not specified
      */
     public AbstractMBean(String mbeanName) throws MalformedObjectNameException {
-        ObjectName objectName = new ObjectNameBuilder(getClass()).withName(mbeanName).build();
+        ObjectName objectName = new ObjectNameBuilder().withObjectName(getClass()).withName(mbeanName).build();
         registration = new MBeanRegistration(this, objectName);
         initialize();
     }

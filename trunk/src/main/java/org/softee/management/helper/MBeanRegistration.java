@@ -34,7 +34,7 @@ public class MBeanRegistration {
      * @throws MalformedObjectNameException
      */
     public MBeanRegistration(Object mBean) throws MalformedObjectNameException {
-        this(mBean, new ObjectNameBuilder(mBean.getClass()).build());
+        this(mBean, new ObjectNameBuilder().withObjectName(mBean.getClass()).build());
     }
 
     /**
