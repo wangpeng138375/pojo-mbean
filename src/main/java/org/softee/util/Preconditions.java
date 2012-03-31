@@ -31,6 +31,16 @@ public class Preconditions {
         return obj;
     }
 
+    public static void assertTrue(boolean b) {
+        assertTrue(b, null);
+    }
+
+    public static void assertTrue(boolean b, String msg) {
+        if (!b) {
+            throw (msg == null) ? new IllegalArgumentException() : new IllegalArgumentException(msg);
+        }
+    }
+
     public static String notEmpty(String s) {
         return notEmpty(s, null);
     }

@@ -9,9 +9,9 @@ import javax.management.DynamicMBean;
 import org.junit.Before;
 import org.junit.Test;
 import org.softee.management.helper.IntrospectedDynamicMBean;
-import org.softee.management.helper.ProxyBuilder;
+import org.softee.management.helper.DynamicProxyFactory;
 
-public class ProxyBuilderTest {
+public class DynamicProxyfactoryTest {
     private DummyAnnotatedMbean annotatedMBean;
     private DynamicMBean introspectedMBean;
     private DummyMbeanInterface interfaceProxy;
@@ -21,7 +21,7 @@ public class ProxyBuilderTest {
     public void before() throws Exception, java.beans.IntrospectionException {
         annotatedMBean = new DummyAnnotatedMbean();
         introspectedMBean = new IntrospectedDynamicMBean(annotatedMBean);
-        interfaceProxy = ProxyBuilder.createDynamicProxy(introspectedMBean, DummyMbeanInterface.class);
+        interfaceProxy = DynamicProxyFactory.createDynamicProxy(introspectedMBean, DummyMbeanInterface.class);
     }
 
     @Test

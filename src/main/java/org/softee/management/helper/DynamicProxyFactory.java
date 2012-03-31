@@ -16,11 +16,11 @@ import javax.management.DynamicMBean;
 
 import org.softee.util.Preconditions;
 
-public class ProxyBuilder {
+public class DynamicProxyFactory {
     /**
      * Non instantiable
      */
-    private ProxyBuilder() {
+    private DynamicProxyFactory() {
 
     }
 
