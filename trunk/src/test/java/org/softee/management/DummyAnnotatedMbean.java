@@ -12,7 +12,7 @@ public class DummyAnnotatedMbean implements DummyMbeanInterface {
     String string = "A string";
     String operationArgument;
     final String lorem = "Here is a Lorem";
-
+    
     @ManagedAttribute @Description("string that can only be read")
     public String getString() {
         return string;
@@ -28,17 +28,33 @@ public class DummyAnnotatedMbean implements DummyMbeanInterface {
         return lorem;
     }
 
+    @ManagedAttribute @Description("A Lorem, DummyException")
+    public String getLoremThrowException() throws DummyException {
+        throw new DummyException("getLoremThrowException");
+    }    
 
     @ManagedOperation @Description("voidOneArgOperation")
     public void voidOneArgOperation(@Parameter("argument") @Description("An argument") String argument) {
         operationArgument = argument;
     }
 
+    @ManagedOperation @Description("voidOneArgOperationException")
+    public void voidOneArgOperationException(@Parameter("argument") @Description("An argument") String argument) throws DummyException {
+        throw new DummyException("voidOneArgOperationException");
+    }
+
+    
     @ManagedAttribute @Description("integer")
     public void setInteger(int integer) {
         this.integer = integer;
     }
 
+    @ManagedAttribute @Description("integerThrowException")
+    public void setIntegerThrowException(int integer) throws DummyException {
+        throw new DummyException("setIntegerThrowException");
+    }
+
+    
     public void notOperation() {
 
     }
