@@ -45,9 +45,22 @@ public class MBeanRegistration {
     public MBeanRegistration(Object mBean, ObjectName mBeanObjectName) {
         this.mBean = mBean;
         this.mBeanObjectName = mBeanObjectName;
-        mBeanServer = ManagementFactory.getPlatformMBeanServer();
+        this.mBeanServer = ManagementFactory.getPlatformMBeanServer();
     }
 
+    /**
+     * @param mBean an MBean instance in the form of a traditional MBean (implementing a sibling *MBean interface) or an
+     *            MXBean (implementing an interface annotated with {@code @MXBean}), or an instance implementing the
+     *            DynamicMBean interface.
+     * @param mBeanObjectName the object name with which {@code mBean} will be registered
+     * @param mBeanServer the MBeanServer to register the mBean in
+     */
+   public MBeanRegistration(Object mBean, ObjectName mBeanObjectName, MBeanServer mBeanServer)
+   {
+       this.mBean = mBean;
+       this.mBeanObjectName = mBeanObjectName;
+       this.mBeanServer = mBeanServer;
+   }
 
     /**
      * Register the MXBean.
@@ -80,5 +93,4 @@ public class MBeanRegistration {
            throw new ManagementException(e);
         }
     }
-
 }
