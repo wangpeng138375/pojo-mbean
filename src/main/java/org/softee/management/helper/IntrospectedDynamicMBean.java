@@ -110,6 +110,8 @@ public class IntrospectedDynamicMBean implements DynamicMBean, MBeanRegistration
                 getter.setAccessible(true);
             }
             return getter.invoke(mbean);
+        } catch (InvocationTargetException e) {
+            throw new MBeanException((Exception) e.getCause());
         } catch (Exception e) {
             throw new RuntimeException(
                     format("Unable to obtain value of attribute %s of %s", attribute, mbeanClass));
@@ -163,7 +165,7 @@ public class IntrospectedDynamicMBean implements DynamicMBean, MBeanRegistration
             throw new ReflectionException(e, format("attribute %s of %s, value = (%s)%s",
                     name, mbeanClass, value.getClass().getName(), value));
         } catch (InvocationTargetException e) {
-            throw new MBeanException(e, format("attribute %s of %s, value = (%s)%s",
+            throw new MBeanException((Exception) e.getCause(), format("attribute %s of %s, value = (%s)%s",
                     name, mbeanClass, value.getClass().getName(), value));
         }
     }
@@ -204,6 +206,8 @@ public class IntrospectedDynamicMBean implements DynamicMBean, MBeanRegistration
                 method.setAccessible(true);
             }
             return method.invoke(mbean, params);
+        } catch (InvocationTargetException e) {
+            throw new MBeanException((Exception) e.getCause());
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
